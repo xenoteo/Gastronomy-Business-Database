@@ -81,7 +81,7 @@ CREATE TABLE Reservations(
     IsByPerson BIT DEFAULT 1,
     FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
     FOREIGN KEY (EmployeeID) REFERENCES Employees(EmployeeID),
-    CHECK (ReservationDate < RealizationDate)
+    CHECK (ReservationDate <= RealizationDate)
 )
 
 IF OBJECT_ID('Menu', 'U') IS NOT NULL
@@ -91,7 +91,7 @@ CREATE TABLE Menu(
     ArrangementDate DATETIME NOT NULL,
     StartDate DATETIME NOT NULL,
     EndDate DATETIME NOT NULL,
-    CHECK(ArrangementDate < StartDate),
+    CHECK(ArrangementDate <= StartDate),
     CHECK(StartDate < EndDate)
 )
 
