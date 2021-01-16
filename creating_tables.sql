@@ -73,7 +73,7 @@ CREATE TABLE Reservations(
     ReservationID INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
     EmployeeID INT NOT NULL,
     CustomerID INT NOT NULL,
-    ReservationDate DATETIME,
+    ReservationDate DATETIME NOT NULL,
     RealizationDate DATETIME NOT NULL,
     NumberOfPeople INT NOT NULL CHECK (NumberOfPeople > 0 AND NumberOfPeople <= 100),
     TableID INT NOT NULL,
