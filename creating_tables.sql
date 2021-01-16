@@ -36,9 +36,11 @@ IF OBJECT_ID('Discounts', 'U') IS NOT NULL
 CREATE TABLE Discounts(
     DiscountID INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
     CustomerID INT NOT NULL,
-    Value FLOAT CHECK (Value > 0 AND Value <= 1),
+    Value FLOAT NOT NULL CHECK (Value > 0 AND Value <= 1),
     DueDate DATETIME,
-    IsOneTime BIT,
+    IssueDate DATETIME NOT NULL,
+    IsOneTime BIT NOT NULL DEFAULT 1,
+    IsAvailable BIT NOT NULL DEFAULT 1,
     FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
 )
 
@@ -89,7 +91,6 @@ CREATE TABLE Menu(
     ArrangementDate DATETIME NOT NULL,
     StartDate DATETIME NOT NULL,
     EndDate DATETIME NOT NULL,
-    isUnavailable BIT NOT NULL DEFAULT 1,
     CHECK(ArrangementDate < StartDate),
     CHECK(StartDate < EndDate)
 )
@@ -131,7 +132,8 @@ IF OBJECT_ID('MenuDishes', 'U') IS NOT NULL
  DROP TABLE MenuDishes
 CREATE TABLE MenuDishes (
     MenuID INT NOT NULL FOREIGN KEY REFERENCES Menu(MenuID),
-    DishID INT FOREIGN KEY REFERENCES Dishes(DishID)
+    DishID INT FOREIGN KEY REFERENCES Dishes(DishID),
+    IsAvailable BIT NOT NULL DEFAULT 1
 )
 
 IF OBJECT_ID('Orders', 'U') IS NOT NULL
