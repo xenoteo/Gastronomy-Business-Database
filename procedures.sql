@@ -551,3 +551,85 @@ BEGIN
 END
 
 EXEC RemoveTablesLimits
+
+
+DROP PROCEDURE IF EXISTS CancelOrder
+GO
+CREATE PROCEDURE CancelOrder
+	@OrderID INT
+AS
+BEGIN
+	IF (SELECT COUNT(OrderID) FROM Orders WHERE OrderID = @OrderID) < 1
+       THROW 50001, 'No such order.', 1
+   DELETE FROM Orders
+   WHERE OrderID = @OrderID
+
+   DELETE FROM OrderDetails
+   WHERE OrderID = @OrderID
+END
+
+DROP PROCEDURE IF EXISTS ChangeDishAvailability
+GO
+CREATE PROCEDURE ChangeDishAvailability
+	@DishID int,
+	@newAvailability bit
+AS
+BEGIN
+	IF (SELECT COUNT(DishID) FROM Dishes WHERE DishID = @DishID) < 1
+       THROW 50001, 'No such dish.', 1
+	UPDATE Dishes
+	SET isAvailable = @newAvailability
+	WHERE DishID = @DishID
+END
+
+EXEC ChangeDishAvailability 1, 1
+
+DROP PROCEDURE IF EXISTS ChangeMenuDishAvailability
+GO
+CREATE PROCEDURE ChangeMenuDishAvailability
+	@MenuID int,
+	@DishID int,
+	@newAvailability bit
+AS
+BEGIN
+	IF (SELECT COUNT(MenuID) FROM Menu WHERE MenuID = @MenuID) < 1
+		THROW 50001, 'No such menu.', 1
+	IF (SELECT COUNT(DishID) FROM Dishes WHERE DishID = @DishID) < 1
+		THROW 50002, 'No such dish.', 1
+	UPDATE MenuDishes
+	SET isAvailable = @newAvailability
+	WHERE DishID = @DishID AND MenuID = @MenuID
+END
+
+EXEC ChangeMenuDishAvailability 1, 1, 0
+
+
+DROP PROCEDURE IF EXISTS ChangeProductUnitsInStock
+GO
+CREATE PROCEDURE ChangeProductUnitsInStock
+	@ProductID int,
+	@NewNumberOfUnits int
+AS
+BEGIN
+	IF (SELECT COUNT(ProductID) FROM Products WHERE ProductID = @ProductID) < 1
+		THROW 50001, 'No such product.', 1
+	UPDATE Products
+	SET UnitsInStock = @NewNumberOfUnits
+	WHERE ProductID = @ProductID
+END
+
+
+DROP PROCEDURE IF EXISTS UseOneTimeDiscount
+GO
+CREATE PROCEDURE UseOneTimeDiscount
+	@DiscountID int
+AS
+BEGIN
+	IF (SELECT COUNT(DiscountID) FROM Discounts WHERE DiscountID = @DiscountID) < 1
+		THROW 50001, 'No such discount.', 1
+	IF (SELECT COUNT(DiscountID) FROM Discounts WHERE DiscountID = @DiscountID AND IsOneTime = 0) > 0
+		THROW 50002, 'This discount is not one time', 1
+	UPDATE Discounts
+	SET IsAvailable = 0
+	WHERE DiscountID = @DiscountID
+END
