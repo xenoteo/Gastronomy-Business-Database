@@ -619,6 +619,21 @@ BEGIN
 END
 
 
+DROP PROCEDURE IF EXISTS ChangeDishPrice
+GO
+CREATE PROCEDURE ChangeDishPrice
+	@DishID int,
+	@Price float
+AS
+BEGIN
+	IF (SELECT COUNT(DishID) FROM Dishes WHERE DishID = @DishID) < 1
+		THROW 50002, 'No such dish.', 1
+	UPDATE Dishes
+	SET UnitPrice = @Price
+	WHERE DishID = @DishID
+END
+
+
 DROP PROCEDURE IF EXISTS UseOneTimeDiscount
 GO
 CREATE PROCEDURE UseOneTimeDiscount
