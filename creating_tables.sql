@@ -14,34 +14,31 @@ CREATE TABLE Customers(
 IF OBJECT_ID('CompanyCustomers', 'U') IS NOT NULL
     DROP TABLE CompanyCustomers
 CREATE TABLE CompanyCustomers(
-    CustomerID INT NOT NULL PRIMARY KEY,
+    CustomerID INT NOT NULL PRIMARY KEY FOREIGN KEY REFERENCES Customers(CustomerID),
     CompanyName VARCHAR(50) NOT NULL UNIQUE,
     ContactPersonName VARCHAR(50),
     ContactPersonTitle VARCHAR(50),
-    Fax VARCHAR(20),
-    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+    Fax VARCHAR(20)
 )
 
 IF OBJECT_ID('IndividualCustomers', 'U') IS NOT NULL
     DROP TABLE IndividualCustomers
 CREATE TABLE IndividualCustomers(
-    CustomerID INT NOT NULL PRIMARY KEY,
+    CustomerID INT NOT NULL PRIMARY KEY FOREIGN KEY REFERENCES Customers(CustomerID),
     FirstName VARCHAR(30) NOT NULL,
-    LastName VARCHAR(30) NOT NULL,
-    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+    LastName VARCHAR(30) NOT NULL
 )
 
 IF OBJECT_ID('Discounts', 'U') IS NOT NULL
     DROP TABLE Discounts
 CREATE TABLE Discounts(
     DiscountID INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
-    CustomerID INT NOT NULL,
+    CustomerID INT NOT NULL FOREIGN KEY REFERENCES Customers(CustomerID),
     Value FLOAT NOT NULL CHECK (Value > 0 AND Value <= 1),
     DueDate DATETIME,
     IssueDate DATETIME NOT NULL,
     IsOneTime BIT NOT NULL DEFAULT 1,
-    IsAvailable BIT NOT NULL DEFAULT 1,
-    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+    IsAvailable BIT NOT NULL DEFAULT 1
 )
 
 IF OBJECT_ID('OrderDiscounts', 'U') IS NOT NULL
@@ -67,20 +64,27 @@ CREATE TABLE Employees(
     Email VARCHAR(30) NOT NULL
 )
 
+IF OBJECT_ID('Tables', 'U') IS NOT NULL
+    DROP TABLE Tables
+CREATE TABLE Tables(
+    TableID INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
+    MaxCapacity INT NOT NULL CHECK (MaxCapacity > 0 AND MaxCapacity <= 100),
+    CurrentCapacity INT NOT NULL CHECK (CurrentCapacity > 0 AND CurrentCapacity <= 100),
+    CHECK (CurrentCapacity <= MaxCapacity)
+)
+
 IF OBJECT_ID('Reservations', 'U') IS NOT NULL
     DROP TABLE Reservations
 CREATE TABLE Reservations(
     ReservationID INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
-    EmployeeID INT NOT NULL,
-    CustomerID INT NOT NULL,
+    EmployeeID INT NOT NULL FOREIGN KEY REFERENCES Employees(EmployeeID),
+    CustomerID INT NOT NULL FOREIGN KEY REFERENCES Customers(CustomerID),
     ReservationDate DATETIME NOT NULL,
     RealizationDate DATETIME NOT NULL,
     NumberOfPeople INT NOT NULL CHECK (NumberOfPeople > 0 AND NumberOfPeople <= 100),
-    TableID INT NOT NULL,
+    TableID INT NOT NULL FOREIGN KEY REFERENCES Tables(TableID),
     IsCancelled BIT DEFAULT 0,
     IsByPerson BIT DEFAULT 1,
-    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
-    FOREIGN KEY (EmployeeID) REFERENCES Employees(EmployeeID),
     CHECK (ReservationDate <= RealizationDate)
 )
 
