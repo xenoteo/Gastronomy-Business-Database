@@ -72,3 +72,24 @@ BEGIN
 		set @worth = 0;
 	RETURN @worth;
 END
+GO
+
+
+DROP FUNCTION IF EXISTS CustomerMonthOrdersNumber
+GO
+CREATE FUNCTION CustomerMonthOrdersNumber
+	(@customerID INT, @month INT)
+RETURNS INT
+AS
+BEGIN
+	DECLARE @ordersNumber INT
+	SELECT @ordersNumber = COUNT(Orders.OrderID) FROM Orders
+	WHERE MONTH(OrderDate) = @month;
+	IF (@ordersNumber IS NULL)
+		SET @ordersNumber = 0;
+	RETURN @ordersNumber;
+END
+GO
+
+SELECT dbo.CustomerMonthOrdersNumber(4, 1)
+SELECT dbo.CustomerMonthOrdersNumber(4, 1)
