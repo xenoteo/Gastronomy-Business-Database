@@ -5,7 +5,7 @@ class Formatter:
     def __init__(self, filename, new_filename):
         self.filename = filename
         self.new_filename = new_filename
-        self.KEYWORDS = ['int', 'nvarchar', 'varchar', 'null', 'bit', 'datetime', 'float', 'on', 'set', 'table', 'select', 'from']
+        self.KEYWORDS = ['int', 'nvarchar', 'varchar', 'null', 'bit', 'datetime', 'float', ' on ', 'set', ' table ', 'select', 'from']
 
     def uppercase(self):
         file = open(self.filename, 'r')

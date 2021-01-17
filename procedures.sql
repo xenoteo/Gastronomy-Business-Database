@@ -1,7 +1,7 @@
 DROP PROCEDURE IF EXISTS AddNewCustomer
 GO
 CREATE PROCEDURE AddNewCustomer
-    @PhONe VARCHAR(20),
+    @Phone VARCHAR(20),
     @Email VARCHAR(30),
     @IsCompany BIT,
     @Address VARCHAR(50) = NULL,
@@ -10,8 +10,8 @@ CREATE PROCEDURE AddNewCustomer
     @Country VARCHAR(30) = NULL
 AS
 BEGIN
-    INSERT INTO Customers(Address, City, PostalCode, Country, PhONe, Email, IsCompany)
-    VALUES (@Address, @City, @PostalCode, @Country, @PhONe, @Email, @IsCompany)
+    INSERT INTO Customers(Address, City, PostalCode, Country, Phone, Email, IsCompany)
+    VALUES (@Address, @City, @PostalCode, @Country, @Phone, @Email, @IsCompany)
 END
 
 
@@ -19,10 +19,10 @@ DROP PROCEDURE IF EXISTS AddNewCompanyCustomer
 GO
 CREATE PROCEDURE AddNewCompanyCustomer
     @CompanyName VARCHAR(50),
-    @PhONe VARCHAR(20),
+    @Phone VARCHAR(20),
     @Email VARCHAR(30),
-    @CONtactPersONName VARCHAR(50) = NULL,
-    @CONtactPersONTitle VARCHAR(50) = NULL,
+    @ContactPersonName VARCHAR(50) = NULL,
+    @ContactPersonTitle VARCHAR(50) = NULL,
     @Fax VARCHAR(20) = NULL,
     @Address VARCHAR(50) = NULL,
     @City VARCHAR(30) = NULL,
@@ -30,11 +30,11 @@ CREATE PROCEDURE AddNewCompanyCustomer
     @Country VARCHAR(30) = NULL
 AS
 BEGIN
-    EXEC AddNewCustomer @PhONe, @Email, 1, @Address, @City, @PostalCode, @Country
+    EXEC AddNewCustomer @Phone, @Email, 1, @Address, @City, @PostalCode, @Country
     DECLARE @CustomerID INT
-    SET @CustomerID = (SELECT CustomerID FROM Customers WHERE Email = @Email AND PhONe = @PhONe)
-    INSERT INTO CompanyCustomers(CustomerID, CompanyName, CONtactPersONName, CONtactPersONTitle, Fax)
-    VALUES (@CustomerID, @CompanyName, @CONtactPersONName, @CONtactPersONTitle, @Fax)
+    SET @CustomerID = (SELECT CustomerID FROM Customers WHERE Email = @Email AND Phone = @Phone)
+    INSERT INTO CompanyCustomers(CustomerID, CompanyName, ContactPersonName, ContactPersonTitle, Fax)
+    VALUES (@CustomerID, @CompanyName, @ContactPersonName, @ContactPersonTitle, @Fax)
 END
 
 EXEC AddNewCompanyCustomer 'Good Company', '123456789', 'email@Gmail.com'
@@ -46,7 +46,7 @@ GO
 CREATE PROCEDURE AddNewIndividualCustomer
     @FirstName VARCHAR(30),
     @LastName VARCHAR(30),
-    @PhONe VARCHAR(20),
+    @Phone VARCHAR(20),
     @Email VARCHAR(30),
     @Address VARCHAR(50) = NULL,
     @City VARCHAR(30) = NULL,
@@ -54,9 +54,9 @@ CREATE PROCEDURE AddNewIndividualCustomer
     @Country VARCHAR(30) = NULL
 AS
 BEGIN
-    EXEC AddNewCustomer @PhONe, @Email, 0, @Address, @City, @PostalCode, @Country
+    EXEC AddNewCustomer @Phone, @Email, 0, @Address, @City, @PostalCode, @Country
     DECLARE @CustomerID INT
-    SET @CustomerID = (SELECT CustomerID FROM Customers WHERE Email = @Email AND PhONe = @PhONe)
+    SET @CustomerID = (SELECT CustomerID FROM Customers WHERE Email = @Email AND Phone = @Phone)
     INSERT INTO IndividualCustomers(CustomerID, FirstName, LastName)
     VALUES (@CustomerID, @FirstName, @LastName)
 END
@@ -71,7 +71,7 @@ CREATE PROCEDURE AddNewEmployee
 	@FirstName VARCHAR(30),
 	@LastName VARCHAR(30),
 	@Title VARCHAR(30),
-	@PhONe VARCHAR(20),
+	@Phone VARCHAR(20),
 	@Email VARCHAR(30),
 	@HireDate DATETIME = NULL,
 	@Address VARCHAR(50) = NULL,
@@ -80,12 +80,12 @@ CREATE PROCEDURE AddNewEmployee
 	@Country NVARCHAR(30) = NULL
 AS
 BEGIN
-	INSERT INTO Employees (FirstName, LastName, Title, PhONe, Email, HireDate, Address, PostalCode, City, Country)
-	VALUES (@FirstName, @LastName, @Title, @PhONe, @Email, @HireDate, @Address, @PostalCode, @City, @Country)
+	INSERT INTO Employees (FirstName, LastName, Title, Phone, Email, HireDate, Address, PostalCode, City, Country)
+	VALUES (@FirstName, @LastName, @Title, @Phone, @Email, @HireDate, @Address, @PostalCode, @City, @Country)
 END
 
 EXEC AddNewEmployee 'Anne', 'Smith', 'head of procurement', '165935616', 'asmith@Gmail.com'
-EXEC AddNewEmployee 'James', 'CamerON', 'Warehouse manager', '789243666', 'jamesCamerON@Restaurant.com', @Address = 'NorthStreet 31/16', @PostalCode = '30-200', @City = 'Naples', @Country = 'Italy'
+EXEC AddNewEmployee 'James', 'Cameron', 'Warehouse manager', '789243666', 'jamesCameron@Restaurant.com', @Address = 'NorthStreet 31/16', @PostalCode = '30-200', @City = 'Naples', @Country = 'Italy'
 
 
 DROP PROCEDURE IF EXISTS AddNewOrder
@@ -94,7 +94,7 @@ CREATE PROCEDURE AddNewOrder
 	@EmployeeID INT,
 	@CustomerID INT,
 	@OrderDate DATETIME,
-	@RequiredRealisatiONDate DATETIME,
+	@RequiredRealisationDate DATETIME,
 	@PickUpDate DATETIME = NULL,
 	@IsTakeAway BIT = 1
 AS
@@ -103,8 +103,8 @@ BEGIN
 		THROW 50001, 'No such employee.', 1
 	IF (SELECT COUNT(CustomerID) FROM Customers WHERE CustomerID = @CustomerID) < 1
 		THROW 50002, 'No such customer.', 1
-	INSERT INTO Orders (EmployeeID, CustomerID, OrderDate, RequiredRealisatiONDate, PickUpDate, IsTakeAway)
-	VALUES (@EmployeeID, @CustomerID, @OrderDate, @RequiredRealisatiONDate, @PickUpDate, @IsTakeAway)
+	INSERT INTO Orders (EmployeeID, CustomerID, OrderDate, RequiredRealisationDate, PickUpDate, IsTakeAway)
+	VALUES (@EmployeeID, @CustomerID, @OrderDate, @RequiredRealisationDate, @PickUpDate, @IsTakeAway)
 END
 
 EXEC AddNewOrder 5, 4, '2021/01/17', '2021/01/27'
@@ -179,15 +179,15 @@ END
 EXEC AddNewProduct 'Penne' , 2
 
 
-DROP PROCEDURE IF EXISTS AddNewProductCategory;
+DROP PROCEDURE IF EXISTS AddNewProductCategory
 GO
 CREATE PROCEDURE AddNewProductCategory
 	@Name VARCHAR(30),
-	@DescriptiON VARCHAR(50) = NULL
+	@Description VARCHAR(50) = NULL
 AS
 BEGIN
-	INSERT INTO ProductCategories (ProductCategoryName, DescriptiON)
-	VALUES (@Name, @DescriptiON)
+	INSERT INTO ProductCategories (ProductCategoryName, Description)
+	VALUES (@Name, @Description)
 END
 
 EXEC AddNewProductCategory 'Seafood', 'Seaweed, sushi and fish'
@@ -213,17 +213,17 @@ EXEC AddNewDiscount 4, 0.25, '2021-01-16'
 EXEC AddNewDiscount 4, 0.30, '2021-01-16', @IsOneTime = 0, @DueDate = '2021-02-16'
 
 
-DROP PROCEDURE IF EXISTS AddNewReservatiON
+DROP PROCEDURE IF EXISTS AddNewReservation
 GO
-CREATE PROCEDURE AddNewReservatiON
+CREATE PROCEDURE AddNewReservation
     @CustomerID INT,
     @EmployeeID INT,
     @NumberOfPeople INT,
-    @RealizatiONDate DATETIME,
-    @ReservatiONDate DATETIME,
+    @RealizationDate DATETIME,
+    @ReservationDate DATETIME,
     @TableID INT,
     @IsCancelled BIT = 0,
-    @IsByPersON BIT = 1
+    @IsByPerson BIT = 1
 AS
 BEGIN
     IF (SELECT COUNT(CustomerID) FROM Customers WHERE CustomerID = @CustomerID) < 1
@@ -231,14 +231,14 @@ BEGIN
     IF (SELECT COUNT(EmployeeID) FROM Employees WHERE EmployeeID = @EmployeeID) < 1
         THROW 50001, 'No such employee.', 1
     IF (SELECT COUNT(TableID) FROM Tables WHERE TableID = @TableID) < 1
-        THROW 50001, 'No such TABLE.', 1
+        THROW 50001, 'No such table.', 1
     IF @NumberOfPeople > (SELECT CurrentCapacity FROM Tables WHERE TableID = @TableID)
         THROW 50002, 'Number of people is too big.', 1
-    INSERT INTO ReservatiONs(EmployeeID, CustomerID, ReservatiONDate, RealizatiONDate, NumberOfPeople, TableID, IsByPersON, IsCancelled)
-    VALUES (@EmployeeID, @CustomerID, @ReservatiONDate, @RealizatiONDate, @NumberOfPeople, @TableID, @IsByPersON, @IsCancelled)
+    INSERT INTO Reservations(EmployeeID, CustomerID, ReservationDate, RealizationDate, NumberOfPeople, TableID, IsByPerson, IsCancelled)
+    VALUES (@EmployeeID, @CustomerID, @ReservationDate, @RealizationDate, @NumberOfPeople, @TableID, @IsByPerson, @IsCancelled)
 END
 
-EXEC AddNewReservatiON 5, 1, 3, '2021-01-29', '2021-01-16', 2
+EXEC AddNewReservation 5, 1, 3, '2021-01-29', '2021-01-16', 2
 
 
 DROP PROCEDURE IF EXISTS AddDishToMenu
@@ -303,7 +303,7 @@ CREATE PROCEDURE ChangeTableCurrentCapacity
 AS
 BEGIN
     IF (SELECT COUNT(TableID) FROM Tables WHERE TableID = @TableID) < 1
-        THROW 50001, 'No such TABLEs.', 1
+        THROW 50001, 'No such tables.', 1
     UPDATE Tables
     SET CurrentCapacity = @NewCurrentCapacity
     WHERE TableID = @TableID
@@ -346,22 +346,22 @@ EXEC RemoveTablesLimits
 DROP PROCEDURE IF EXISTS ChangeTableParticipants
 GO
 CREATE PROCEDURE ChangeTableParticipants
-    @ReservatiONID INT,
+    @ReservationID INT,
     @NewNumberOfPeople INT
 AS
 BEGIN
-    IF (SELECT COUNT(ReservatiONID) FROM ReservatiONs WHERE ReservatiONID = @ReservatiONID) < 1
-        THROW 50001, 'No such reservatiON.', 1
+    IF (SELECT COUNT(ReservationID) FROM Reservations WHERE ReservationID = @ReservationID) < 1
+        THROW 50001, 'No such reservation.', 1
     IF @NewNumberOfPeople > (
                                 SELECT CurrentCapacity
-                                FROM ReservatiONs R
+                                FROM Reservations R
                                 INNER JOIN Tables T ON T.TableID = R.TableID
-                                WHERE ReservatiONID = @ReservatiONID
+                                WHERE ReservationID = @ReservationID
                             )
         THROW 50002, 'Number of people is too big.', 1
-    UPDATE ReservatiONs
+    UPDATE Reservations
     SET NumberOfPeople = @NewNumberOfPeople
-    WHERE ReservatiONID = @ReservatiONID
+    WHERE ReservationID = @ReservationID
 END
 
 EXEC ChangeTableParticipants 1, 6
@@ -371,7 +371,7 @@ DROP PROCEDURE IF EXISTS ChangeCustomerData
 GO
 CREATE PROCEDURE ChangeCustomerData
     @CustomerID INT,
-    @PhONe VARCHAR(20) = NULL,
+    @Phone VARCHAR(20) = NULL,
     @Email VARCHAR(30) = NULL,
     @Address VARCHAR(50) = NULL,
     @City VARCHAR(30) = NULL,
@@ -381,9 +381,9 @@ AS
 BEGIN
     IF (SELECT COUNT(CustomerID) FROM Customers WHERE CustomerID = @CustomerID) < 1
         THROW 50001, 'No such customer.', 1
-    IF @PhONe IS NOT NULL
+    IF @Phone IS NOT NULL
         UPDATE Customers
-        SET PhONe = @PhONe
+        SET Phone = @Phone
         WHERE CustomerID = @CustomerID
     IF @Email IS NOT NULL
         UPDATE Customers
@@ -416,10 +416,10 @@ GO
 CREATE PROCEDURE ChangeCompanyCustomerData
     @CustomerID INT,
     @CompanyName VARCHAR(50) = NULL,
-    @CONtactPersONName VARCHAR(50) = NULL,
-    @CONtactPersONTitle VARCHAR(50) = NULL,
+    @ContactPersonName VARCHAR(50) = NULL,
+    @ContactPersonTitle VARCHAR(50) = NULL,
     @Fax VARCHAR(20) = NULL,
-    @PhONe VARCHAR(20) = NULL,
+    @Phone VARCHAR(20) = NULL,
     @Email VARCHAR(30) = NULL,
     @Address VARCHAR(50) = NULL,
     @City VARCHAR(30) = NULL,
@@ -429,18 +429,18 @@ AS
 BEGIN
     IF (SELECT COUNT(CustomerID) FROM CompanyCustomers WHERE CustomerID = @CustomerID) < 1
         THROW 50001, 'No such company customer.', 1
-    EXEC ChangeCustomerData @CustomerID, @PhONe, @Email, @Address, @City, @PostalCode, @Country
+    EXEC ChangeCustomerData @CustomerID, @Phone, @Email, @Address, @City, @PostalCode, @Country
     IF @CompanyName IS NOT NULL
         UPDATE CompanyCustomers
         SET CompanyName = @CompanyName
         WHERE CustomerID = @CustomerID
-    IF @CONtactPersONName IS NOT NULL
+    IF @ContactPersonName IS NOT NULL
         UPDATE CompanyCustomers
-        SET CONtactPersONName = @CONtactPersONName
+        SET ContactPersonName = @ContactPersonName
         WHERE CustomerID = @CustomerID
-    IF @CONtactPersONName IS NOT NULL
+    IF @ContactPersonName IS NOT NULL
         UPDATE CompanyCustomers
-        SET CONtactPersONTitle = @CONtactPersONTitle
+        SET ContactPersonTitle = @ContactPersonTitle
         WHERE CustomerID = @CustomerID
     IF @Fax IS NOT NULL
         UPDATE CompanyCustomers
@@ -448,7 +448,7 @@ BEGIN
         WHERE CustomerID = @CustomerID
 END
 
-EXEC ChangeCompanyCustomerData 4, @CompanyName = 'Very Good Company', @CONtactPersONName = 'John Doe', @City = 'Krakow'
+EXEC ChangeCompanyCustomerData 4, @CompanyName = 'Very Good Company', @ContactPersonName = 'John Doe', @City = 'Krakow'
 
 
 DROP PROCEDURE IF EXISTS ChangeIndividualCustomerData
@@ -457,7 +457,7 @@ CREATE PROCEDURE ChangeIndividualCustomerData
     @CustomerID INT,
     @FirstName VARCHAR(30) = NULL,
     @LastName VARCHAR(30) = NULL,
-    @PhONe VARCHAR(20) = NULL,
+    @Phone VARCHAR(20) = NULL,
     @Email VARCHAR(30) = NULL,
     @Address VARCHAR(50) = NULL,
     @City VARCHAR(30) = NULL,
@@ -467,7 +467,7 @@ AS
 BEGIN
     IF (SELECT COUNT(CustomerID) FROM IndividualCustomers WHERE CustomerID = @CustomerID) < 1
         THROW 50001, 'No such individual customer.', 1
-    EXEC ChangeCustomerData @CustomerID, @PhONe, @Email, @Address, @City, @PostalCode, @Country
+    EXEC ChangeCustomerData @CustomerID, @Phone, @Email, @Address, @City, @PostalCode, @Country
     IF @FirstName IS NOT NULL
         UPDATE IndividualCustomers
         SET FirstName = @FirstName
@@ -489,7 +489,7 @@ CREATE PROCEDURE ChangeEmployeeData
     @LastName VARCHAR(30) = NULL,
     @Title VARCHAR(30) = NULL,
     @HireDate DATETIME = NULL,
-    @PhONe VARCHAR(20) = NULL,
+    @Phone VARCHAR(20) = NULL,
     @Email VARCHAR(30) = NULL,
     @Address VARCHAR(50) = NULL,
     @City VARCHAR(30) = NULL,
@@ -515,9 +515,9 @@ BEGIN
         UPDATE Employees
         SET HireDate = @HireDate
         WHERE EmployeeID = @EmployeeID
-    IF @PhONe IS NOT NULL
+    IF @Phone IS NOT NULL
         UPDATE Employees
-        SET PhONe = @PhONe
+        SET Phone = @Phone
         WHERE EmployeeID = @EmployeeID
     IF @Email IS NOT NULL
         UPDATE Employees
@@ -559,20 +559,20 @@ END
 EXEC RemoveEmployee 1
 
 
-DROP PROCEDURE IF EXISTS CancelReservatiON
+DROP PROCEDURE IF EXISTS CancelReservation
 GO
-CREATE PROCEDURE CancelReservatiON
-    @ReservatiONID INT
+CREATE PROCEDURE CancelReservation
+    @ReservationID INT
 AS
 BEGIN
-    IF (SELECT COUNT(ReservatiONID) FROM ReservatiONs WHERE ReservatiONID = @ReservatiONID) < 1
-        THROW 50001, 'No such reservatiON.', 1
-    UPDATE ReservatiONs
+    IF (SELECT COUNT(ReservationID) FROM Reservations WHERE ReservationID = @ReservationID) < 1
+        THROW 50001, 'No such reservation.', 1
+    UPDATE Reservations
     SET IsCancelled = 1
-    WHERE ReservatiONID = @ReservatiONID
+    WHERE ReservationID = @ReservationID
 END
 
-EXEC CancelReservatiON 1
+EXEC CancelReservation 1
 
 
 DROP PROCEDURE IF EXISTS CancelOrder
@@ -670,7 +670,7 @@ BEGIN
 	IF (SELECT COUNT(DiscountID) FROM Discounts WHERE DiscountID = @DiscountID) < 1
 		THROW 50001, 'No such discount.', 1
 	IF (SELECT COUNT(DiscountID) FROM Discounts WHERE DiscountID = @DiscountID AND IsOneTime = 0) > 0
-		THROW 50002, 'This discount is not ONe time', 1
+		THROW 50002, 'This discount is not one time', 1
 	UPDATE Discounts
 	SET IsAvailable = 0
 	WHERE DiscountID = @DiscountID
