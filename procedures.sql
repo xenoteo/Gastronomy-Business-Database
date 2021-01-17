@@ -62,6 +62,121 @@ EXEC AddNewIndividualCustomer 'John', 'Doe', '123456123', 'john@gmail.com'
 EXEC AddNewIndividualCustomer 'John', 'Doe', '123456124', 'john2@gmail.com', @city = 'Warsaw'
 
 
+DROP PROCEDURE IF EXISTS AddNewEmployee;
+GO
+CREATE PROCEDURE AddNewEmployee
+	@FirstName varchar(30),
+	@LastName varchar(30),
+	@Title varchar(30),
+	@Phone varchar(20),
+	@Email varchar(30),
+	@HireDate datetime = null,
+	@Address varchar(50) = null,
+	@PostalCode nvarchar(30) = null,
+	@City nvarchar(30) = null,
+	@Country nvarchar(30) = null
+AS
+BEGIN
+	INSERT INTO Employees (FirstName, LastName, Title, Phone, Email, HireDate, Address, PostalCode, City, Country)
+	VALUES (@FirstName, @LastName, @Title, @Phone, @Email, @HireDate, @Address, @PostalCode, @City, @Country)
+END
+
+EXEC AddNewEmployee 'Anne', 'Smith', 'head of procurement', '165935616', 'asmith@gmail.com'
+EXEC AddNewEmployee 'James', 'Cameron', 'Warehouse manager', '789243666', 'jamesCameron@restaurant.com', @Address = 'NorthStreet 31/16', @PostalCode = '30-200', @City = 'Naples', @Country = 'Italy'
+
+
+DROP PROCEDURE IF EXISTS AddNewOrder;
+GO
+CREATE PROCEDURE AddNewOrder
+	@EmployeeID int,
+	@CustomerID int,
+	@OrderDate datetime,
+	@RequiredRealisationDate datetime,
+	@PickUpDate datetime = null,
+	@IsTakeAway bit = 1
+AS
+BEGIN
+	INSERT INTO Orders (EmployeeID, CustomerID, OrderDate, RequiredRealisationDate, PickUpDate, IsTakeAway)
+	VALUES (@EmployeeID, @CustomerID, @OrderDate, @RequiredRealisationDate, @PickUpDate, @IsTakeAway)
+END
+
+EXEC AddNewOrder 5, 4, '2021/01/17', '2021/01/27' 
+
+
+DROP PROCEDURE IF EXISTS AddNewOrderDetails
+GO
+CREATE PROCEDURE AddNewOrderDetails
+	@OrderID int,
+	@DishID int,
+	@UnitPrice float,
+	@Quantity int = 1
+AS
+BEGIN
+	INSERT INTO OrderDetails (OrderID, DishID, UnitPrice, Quantity)
+	VALUES (@OrderID, @DishID, @UnitPrice, @Quantity)
+END
+
+EXEC AddNewOrderDetails 1, 1, 25.5
+
+
+DROP PROCEDURE IF EXISTS AddNewProductCategory;
+GO
+CREATE PROCEDURE AddNewProductCategory
+	@Name varchar(30),
+	@Description varchar(50) = null
+AS
+BEGIN
+	INSERT INTO ProductCategories (ProductCategoryName, Description)
+	VALUES (@Name, @Description)
+END
+
+EXEC AddNewProductCategory 'Seafood', 'Seaweed, sushi and fish'
+EXEC AddNewProductCategory 'Pasta'
+
+
+DROP PROCEDURE IF EXISTS AddNewProduct
+GO
+CREATE PROCEDURE AddNewProduct
+	@Name varchar(50),
+	@ProductCategoryID int,
+	@UnitsInStock int = 0
+AS
+BEGIN
+	INSERT INTO Products (ProductName, ProductCategoryID, UnitsInStock)
+	VALUES (@Name, @ProductCategoryID, @UnitsInStock)
+END
+
+EXEC AddNewProduct 'Penne' , 2
+
+
+DROP PROCEDURE IF EXISTS AddNewDish
+GO
+CREATE PROCEDURE AddNewDish
+	@Name varchar(50),
+	@UnitPrice float,
+AS
+BEGIN
+	INSERT INTO Dishes(DishName, UnitPrice)
+	VALUES (@Name, @UnitPrice)
+END
+
+exec AddNewDish 'Penne al forno', 25.50
+
+
+DROP PROCEDURE IF EXISTS AddProductToDish
+GO
+CREATE PROCEDURE AddProductToDish
+	@ProductID int,
+	@DishID int
+AS
+BEGIN
+	INSERT INTO DishDetails (ProductID, DishID)
+	VALUES (@ProductID, @DishID)
+END
+
+EXEC AddProductToDish 2, 1
+
+
 DROP PROCEDURE IF EXISTS AddNewDiscount;
 CREATE PROCEDURE AddNewDiscount
     @customerID INT,
