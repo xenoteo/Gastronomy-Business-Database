@@ -93,6 +93,47 @@ END
 SELECT dbo.CustomerMonthOrdersNumber(4, 1, 2021)
 
 
+DROP FUNCTION IF EXISTS CustomerQuarterWorth
+GO
+CREATE FUNCTION CustomerQuarterWorth
+	(@customerID INT, @quarter INT)
+RETURNS FLOAT
+AS
+BEGIN
+	DECLARE @Worth INT
+	SELECT @Worth = SUM(OrderDetails.UnitPrice * OrderDetails.Quantity * (1 - ISNULL(Discounts.Value, 0)))
+	FROM Orders
+	INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+	LEFT JOIN OrderDiscounts ON Orders.OrderID = OrderDiscounts.OrderID
+    LEFT JOIN Discounts ON OrderDiscounts.DiscountID = Discounts.DiscountID
+	WHERE Orders.CustomerID = @CustomerID AND DATEPART(QUARTER, Orders.OrderDate) = @quarter
+	GROUP BY Orders.OrderID;
+
+	IF (@Worth IS NULL)
+		SET @Worth = 0;
+	RETURN @Worth;
+END
+GO
+
+SELECT dbo.CustomerQuarterWorth(4, 1)
+
+DROP FUNCTION IF EXISTS ReservationReport
+GO
+CREATE FUNCTION ReservationReport
+	(@startDate DATETIME, @endDate DATETIME)
+RETURNS TABLE
+AS
+RETURN
+(
+	SELECT ReservationID, EmployeeID, CustomerID, ReservationDate, RealizationDate, NumberOfPeople, IsCancelled, IsByPerson, Tables.TableID from Reservations
+	INNER JOIN Tables ON Tables.TableID = Reservations.TableID
+	WHERE RealizationDate >= @startDate AND RealizationDate <= @endDate
+);
+GO
+
+select * from ReservationReport('2021-01-17', '2021-03-15')
+
+
 DROP FUNCTION IF EXISTS MenuReport
 CREATE FUNCTION MenuReport
     (@StartDate DATETIME, @EndDate DATETIME)
