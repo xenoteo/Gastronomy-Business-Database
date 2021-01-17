@@ -1,4 +1,5 @@
 DROP FUNCTION IF EXISTS FreeTables
+GO
 CREATE FUNCTION FreeTables
     (@StartDate DATETIME, @EndDate DATETIME)
 RETURNS @FreeTables TABLE
@@ -11,14 +12,15 @@ AS
 BEGIN
     INSERT INTO @FreeTables
     SELECT R.TableID, MaxCapacity, CurrentCapacity
-    FROM Reservations R INNER JOIN Tables T ON R.TableID = T.TableID
-    WHERE RealizationDate >= @StartDate AND ReservationDate <= @EndDate
+    FROM ReservatiONs R INNER JOIN Tables T ON R.TableID = T.TableID
+    WHERE RealizatiONDate >= @StartDate AND ReservatiONDate <= @EndDate
     RETURN
 END
 
 SELECT * FROM FreeTables('2021-01-27', '2021-02-01')
 
 DROP FUNCTION IF EXISTS CustomerDiscounts
+GO
 CREATE FUNCTION CustomerDiscounts
 	(@CustomerID INT)
 RETURNS TABLE
@@ -29,12 +31,13 @@ RETURN
 	WHERE CustomerID = @CustomerID
 );
 
-select * from CustomerDiscounts(4)
+SELECT * FROM CustomerDiscounts(4)
 
 
 DROP FUNCTION IF EXISTS CustomerOrdersNumber
+GO
 CREATE FUNCTION CustomerOrdersNumber
-	(@CustomerID INT, @Money FLOAT)
+	(@CustomerID INT, @MONey FLOAT)
 RETURNS INT
 AS
 BEGIN
@@ -43,7 +46,7 @@ BEGIN
 	FROM Orders
 	INNER JOIN OrderDetails
 	ON Orders.OrderID = OrderDetails.OrderID
-	WHERE Orders.CustomerID = @CustomerID AND OrderDetails.UnitPrice >= @Money
+	WHERE Orders.CustomerID = @CustomerID AND OrderDetails.UnitPrice >= @MONey
 	GROUP BY Orders.OrderID;
 	IF (@OrderNumber IS NULL)
 		SET @OrderNumber = 0;
@@ -54,6 +57,7 @@ SELECT dbo.CustomerOrdersNumber(4, 20.0) AS OrdersNumber
 
 
 DROP FUNCTION IF EXISTS CustomerOrderWorth
+GO
 CREATE FUNCTION CustomerOrderWorth
 	(@CustomerID INT)
 RETURNS FLOAT
@@ -76,27 +80,28 @@ END
 SELECT dbo.CustomerOrderWorth(4) AS OrdersWorth
 
 
-DROP FUNCTION IF EXISTS CustomerMonthOrdersNumber
-CREATE FUNCTION CustomerMonthOrdersNumber
-	(@CustomerID INT, @Month INT, @Year INT)
+DROP FUNCTION IF EXISTS CustomerMONthOrdersNumber
+GO
+CREATE FUNCTION CustomerMONthOrdersNumber
+	(@CustomerID INT, @MONth INT, @Year INT)
 RETURNS INT
 AS
 BEGIN
 	DECLARE @OrdersNumber INT
 	SELECT @OrdersNumber = COUNT(Orders.OrderID) FROM Orders
-	WHERE MONTH(OrderDate) = @Month AND YEAR(OrderDate) = @Year AND CustomerID = @CustomerID
+	WHERE MONTH(OrderDate) = @MONth AND YEAR(OrderDate) = @Year AND CustomerID = @CustomerID
 	IF (@OrdersNumber IS NULL)
 		SET @OrdersNumber = 0
 	RETURN @OrdersNumber
 END
 
-SELECT dbo.CustomerMonthOrdersNumber(4, 1, 2021)
+SELECT dbo.CustomerMONthOrdersNumber(4, 1, 2021)
 
 
 DROP FUNCTION IF EXISTS CustomerQuarterWorth
 GO
 CREATE FUNCTION CustomerQuarterWorth
-	(@customerID INT, @quarter INT)
+	(@CustomerID INT, @Quarter INT)
 RETURNS FLOAT
 AS
 BEGIN
@@ -106,35 +111,34 @@ BEGIN
 	INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
 	LEFT JOIN OrderDiscounts ON Orders.OrderID = OrderDiscounts.OrderID
     LEFT JOIN Discounts ON OrderDiscounts.DiscountID = Discounts.DiscountID
-	WHERE Orders.CustomerID = @CustomerID AND DATEPART(QUARTER, Orders.OrderDate) = @quarter
+	WHERE Orders.CustomerID = @CustomerID AND DATEPART(QUARTER, Orders.OrderDate) = @Quarter
 	GROUP BY Orders.OrderID;
 
 	IF (@Worth IS NULL)
 		SET @Worth = 0;
 	RETURN @Worth;
 END
-GO
 
 SELECT dbo.CustomerQuarterWorth(4, 1)
 
-DROP FUNCTION IF EXISTS ReservationReport
+DROP FUNCTION IF EXISTS ReservatiONReport
 GO
-CREATE FUNCTION ReservationReport
-	(@startDate DATETIME, @endDate DATETIME)
+CREATE FUNCTION ReservatiONReport
+	(@StartDate DATETIME, @EndDate DATETIME)
 RETURNS TABLE
 AS
 RETURN
 (
-	SELECT ReservationID, EmployeeID, CustomerID, ReservationDate, RealizationDate, NumberOfPeople, IsCancelled, IsByPerson, Tables.TableID from Reservations
-	INNER JOIN Tables ON Tables.TableID = Reservations.TableID
-	WHERE RealizationDate >= @startDate AND RealizationDate <= @endDate
+	SELECT ReservatiONID, EmployeeID, CustomerID, ReservatiONDate, RealizatiONDate, NumberOfPeople, IsCancelled, IsByPersON, Tables.TableID FROM ReservatiONs
+	INNER JOIN Tables ON Tables.TableID = ReservatiONs.TableID
+	WHERE RealizatiONDate >= @StartDate AND RealizatiONDate <= @EndDate
 );
-GO
 
-select * from ReservationReport('2021-01-17', '2021-03-15')
+SELECT * FROM ReservatiONReport('2021-01-17', '2021-03-15')
 
 
 DROP FUNCTION IF EXISTS MenuReport
+GO
 CREATE FUNCTION MenuReport
     (@StartDate DATETIME, @EndDate DATETIME)
 RETURNS @Report TABLE
@@ -161,6 +165,7 @@ SELECT * FROM MenuReport('2021-01-15', '2021-02-01')
 
 
 DROP FUNCTION IF EXISTS CustomerOrders
+GO
 CREATE FUNCTION CustomerOrders
     (@CustomerID INT)
 RETURNS @Stats TABLE
