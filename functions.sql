@@ -18,6 +18,21 @@ END
 
 SELECT * FROM FreeTables('2021-01-27', '2021-02-01')
 
+DROP FUNCTION IF EXISTS CustomerDiscounts
+GO
+CREATE FUNCTION CustomerDiscounts
+	(@customerID INT)
+RETURNS TABLE
+AS
+RETURN
+(
+	SELECT * FROM Discounts
+	WHERE CustomerID = @customerID
+);
+GO
+
+select * from CustomerDiscounts(4)
+
 
 DROP FUNCTION IF EXISTS CustomerOrdersNumber
 GO
