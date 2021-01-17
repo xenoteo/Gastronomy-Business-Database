@@ -1,4 +1,4 @@
-DROP PROCEDURE IF EXISTS AddNewCustomer;
+DROP PROCEDURE IF EXISTS AddNewCustomer
 CREATE PROCEDURE AddNewCustomer
     @phone VARCHAR(20),
     @email VARCHAR(30),
@@ -14,7 +14,7 @@ BEGIN
 END
 
 
-DROP PROCEDURE IF EXISTS AddNewCompanyCustomer;
+DROP PROCEDURE IF EXISTS AddNewCompanyCustomer
 CREATE PROCEDURE AddNewCompanyCustomer
     @companyName VARCHAR(50),
     @phone VARCHAR(20),
@@ -39,7 +39,7 @@ EXEC AddNewCompanyCustomer 'Good Company', '123456789', 'email@gmail.com'
 EXEC AddNewCompanyCustomer 'Good Company 2', '123456799', 'email2@gmail.com', @country = 'Poland'
 
 
-DROP PROCEDURE IF EXISTS AddNewIndividualCustomer;
+DROP PROCEDURE IF EXISTS AddNewIndividualCustomer
 CREATE PROCEDURE AddNewIndividualCustomer
     @firstName VARCHAR(30),
     @lastName VARCHAR(30),
@@ -62,7 +62,7 @@ EXEC AddNewIndividualCustomer 'John', 'Doe', '123456123', 'john@gmail.com'
 EXEC AddNewIndividualCustomer 'John', 'Doe', '123456124', 'john2@gmail.com', @city = 'Warsaw'
 
 
-DROP PROCEDURE IF EXISTS AddNewDiscount;
+DROP PROCEDURE IF EXISTS AddNewDiscount
 CREATE PROCEDURE AddNewDiscount
     @customerID INT,
     @value FLOAT,
@@ -80,7 +80,7 @@ EXEC AddNewDiscount 4, 0.25, '2021-01-16'
 EXEC AddNewDiscount 4, 0.30, '2021-01-16', @isOneTime = 0, @dueDate = '2021-02-16'
 
 
-DROP PROCEDURE IF EXISTS AddNewReservation;
+DROP PROCEDURE IF EXISTS AddNewReservation
 CREATE PROCEDURE AddNewReservation
     @customerID INT,
     @employeeID INT,
@@ -92,29 +92,38 @@ CREATE PROCEDURE AddNewReservation
     @isByPerson BIT = 1
 AS
 BEGIN
+    IF (SELECT COUNT(CustomerID) FROM Customers WHERE CustomerID = @customerID) < 1
+        OR (SELECT COUNT(EmployeeID) FROM Employees WHERE EmployeeID = @employeeID) < 1
+        OR (SELECT COUNT(TableID) FROM Tables WHERE TableID = @tableID) < 1
+            THROW 50001, 'No such customer, employee or table.', 1
+    IF @numberOfPeople > (SELECT CurrentCapacity FROM Tables WHERE TableID = @tableID)
+        THROW 50002, 'Number of people is too big.', 1
     INSERT INTO Reservations(EmployeeID, CustomerID, ReservationDate, RealizationDate, NumberOfPeople, TableID, IsByPerson, IsCancelled)
     VALUES (@employeeID, @customerID, @reservationDate, @realizationDate, @numberOfPeople, @tableID, @isByPerson, @isCancelled)
 END
 
-EXEC AddNewReservation 5, 1, 4, '2021-01-29', '2021-01-16', 2
+EXEC AddNewReservation 5, 1, 3, '2021-01-29', '2021-01-16', 2
 
 
-DROP PROCEDURE IF EXISTS AddDishToMenu;
+DROP PROCEDURE IF EXISTS AddDishToMenu
 CREATE PROCEDURE AddDishToMenu
     @menuID INT,
     @dishID INT,
     @isAvailable BIT = 1
 AS
 BEGIN
+    IF (SELECT COUNT(MenuID) FROM Menu WHERE MenuID = @menuID) < 1
+        OR (SELECT COUNT(DishID) FROM Dishes WHERE DishID = @dishID) < 1
+        THROW 50001, 'No such menu or dish.', 1
     INSERT INTO MenuDishes(MenuID, DishID, IsAvailable)
     VALUES (@menuID, @dishID, @isAvailable)
 END
 
-EXEC AddDishToMenu 1, 10
-EXEC AddDishToMenu 1, 10, 0
+EXEC AddDishToMenu 1, 1
+EXEC AddDishToMenu 1, 1, 0
 
 
-DROP PROCEDURE IF EXISTS AddNewMenu;
+DROP PROCEDURE IF EXISTS AddNewMenu
 CREATE PROCEDURE AddNewMenu
     @arrangementDate DATETIME,
     @startDate DATETIME,
@@ -128,11 +137,13 @@ END
 EXEC AddNewMenu '2021-01-16', '2021-01-18', '2021-01-22'
 
 
-DROP PROCEDURE IF EXISTS CancelReservation;
+DROP PROCEDURE IF EXISTS CancelReservation
 CREATE PROCEDURE CancelReservation
     @reservationID INT
 AS
 BEGIN
+    IF (SELECT COUNT(ReservationID) FROM Reservations WHERE ReservationID = @reservationID) < 1
+        THROW 50001, 'No such reservation.', 1
     UPDATE Reservations
     SET IsCancelled = 1
     WHERE ReservationID = @reservationID
@@ -141,12 +152,21 @@ END
 EXEC CancelReservation 1
 
 
-DROP PROCEDURE IF EXISTS ChangeTableParticipants;
+DROP PROCEDURE IF EXISTS ChangeTableParticipants
 CREATE PROCEDURE ChangeTableParticipants
     @reservationID INT,
     @newNumberOfPeople INT
 AS
 BEGIN
+    IF (SELECT COUNT(ReservationID) FROM Reservations WHERE ReservationID = @reservationID) < 1
+        THROW 50001, 'No such reservation.', 1
+    IF @newNumberOfPeople > (
+                                SELECT CurrentCapacity
+                                FROM Reservations R
+                                INNER JOIN Tables T ON T.TableID = R.TableID
+                                WHERE ReservationID = @reservationID
+                            )
+        THROW 50002, 'Number of people is too big.', 1
     UPDATE Reservations
     SET NumberOfPeople = @newNumberOfPeople
     WHERE ReservationID = @reservationID
@@ -155,11 +175,13 @@ END
 EXEC ChangeTableParticipants 1, 6
 
 
-DROP PROCEDURE IF EXISTS RemoveEmployee;
+DROP PROCEDURE IF EXISTS RemoveEmployee
 CREATE PROCEDURE RemoveEmployee
     @employeeID INT
 AS
 BEGIN
+    IF (SELECT COUNT(EmployeeID) FROM Employees WHERE EmployeeID = @employeeID) < 1
+        THROW 50001, 'No such employee.', 1
     DELETE FROM Employees
     WHERE EmployeeID = @employeeID
 END
@@ -167,7 +189,7 @@ END
 EXEC RemoveEmployee 1
 
 
-DROP PROCEDURE IF EXISTS ChangeCustomerData;
+DROP PROCEDURE IF EXISTS ChangeCustomerData
 CREATE PROCEDURE ChangeCustomerData
     @customerID INT,
     @phone VARCHAR(20) = NULL,
@@ -178,6 +200,8 @@ CREATE PROCEDURE ChangeCustomerData
     @country VARCHAR(30) = NULL
 AS
 BEGIN
+    IF (SELECT COUNT(CustomerID) FROM Customers WHERE CustomerID = @customerID) < 1
+        THROW 50001, 'No such customer.', 1
     IF @phone IS NOT NULL
         UPDATE Customers
         SET Phone = @phone
@@ -208,7 +232,7 @@ EXEC ChangeCustomerData 4, @email = 'good_email@gmail.com'
 EXEC ChangeCustomerData 5, @email = 'john@gmail.com', @city = 'Gdansk'
 
 
-DROP PROCEDURE IF EXISTS ChangeCompanyCustomerData;
+DROP PROCEDURE IF EXISTS ChangeCompanyCustomerData
 CREATE PROCEDURE ChangeCompanyCustomerData
     @customerID INT,
     @companyName VARCHAR(50) = NULL,
@@ -223,6 +247,8 @@ CREATE PROCEDURE ChangeCompanyCustomerData
     @country VARCHAR(30) = NULL
 AS
 BEGIN
+    IF (SELECT COUNT(CustomerID) FROM CompanyCustomers WHERE CustomerID = @customerID) < 1
+        THROW 50001, 'No such company customer.', 1
     EXEC ChangeCustomerData @customerID, @phone, @email, @address, @city, @postalCode, @country
     IF @companyName IS NOT NULL
         UPDATE CompanyCustomers
@@ -245,7 +271,7 @@ END
 EXEC ChangeCompanyCustomerData 4, @companyName = 'Very Good Company', @contactPersonName = 'John Doe', @city = 'Krakow'
 
 
-DROP PROCEDURE IF EXISTS ChangeIndividualCustomerData;
+DROP PROCEDURE IF EXISTS ChangeIndividualCustomerData
 CREATE PROCEDURE ChangeIndividualCustomerData
     @customerID INT,
     @firstName VARCHAR(30) = NULL,
@@ -258,6 +284,8 @@ CREATE PROCEDURE ChangeIndividualCustomerData
     @country VARCHAR(30) = NULL
 AS
 BEGIN
+    IF (SELECT COUNT(CustomerID) FROM IndividualCustomers WHERE CustomerID = @customerID) < 1
+        THROW 50001, 'No such individual customer.', 1
     EXEC ChangeCustomerData @customerID, @phone, @email, @address, @city, @postalCode, @country
     IF @firstName IS NOT NULL
         UPDATE IndividualCustomers
@@ -272,7 +300,7 @@ END
 EXEC ChangeIndividualCustomerData 6, @lastName = 'Smith', @country = 'Poland'
 
 
-DROP PROCEDURE IF EXISTS ChangeEmployeeData;
+DROP PROCEDURE IF EXISTS ChangeEmployeeData
 CREATE PROCEDURE ChangeEmployeeData
     @employeeID INT,
     @firstName VARCHAR(30) = NULL,
@@ -287,6 +315,8 @@ CREATE PROCEDURE ChangeEmployeeData
     @country VARCHAR(30) = NULL
 AS
 BEGIN
+    IF (SELECT COUNT(EmployeeID) FROM Employees WHERE EmployeeID = @employeeID) < 1
+        THROW 50001, 'No such employee.', 1
     IF @firstName IS NOT NULL
         UPDATE Employees
         SET FirstName = @firstName
@@ -330,3 +360,66 @@ BEGIN
 END
 
 EXEC ChangeEmployeeData 1, @city = 'Warsaw', @country = 'Poland'
+
+
+DROP PROCEDURE IF EXISTS AddNewTable
+CREATE PROCEDURE AddNewTable
+    @maxCapacity INT,
+    @currentCapacity INT = NULL
+AS
+BEGIN
+    IF @currentCapacity IS NOT NULL
+        INSERT INTO Tables(MaxCapacity, CurrentCapacity)
+        VALUES (@maxCapacity, @currentCapacity)
+    ELSE
+        INSERT INTO Tables(MaxCapacity, CurrentCapacity)
+        VALUES (@maxCapacity, @maxCapacity)
+END
+
+EXEC AddNewTable 10
+EXEC AddNewTable 10, 4
+
+
+DROP PROCEDURE IF EXISTS ChangeTableCurrentCapacity
+CREATE PROCEDURE ChangeTableCurrentCapacity
+    @tableID INT,
+    @newCurrentCapacity INT
+AS
+BEGIN
+    IF (SELECT COUNT(TableID) FROM Tables WHERE TableID = @tableID) < 1
+        THROW 50001, 'No such tables.', 1
+    UPDATE Tables
+    SET CurrentCapacity = @newCurrentCapacity
+    WHERE TableID = @tableID
+END
+
+EXEC ChangeTableCurrentCapacity 1, 5
+
+
+DROP PROCEDURE IF EXISTS ChangeTablesLimit
+CREATE PROCEDURE ChangeTablesLimit
+    @newLimit INT
+AS
+BEGIN
+    DECLARE @generalCapacity INT
+    SET @generalCapacity = (SELECT SUM(MaxCapacity) FROM Tables)
+    IF @newLimit > @generalCapacity
+        THROW 50002, 'New limit is too big.', 1
+    DECLARE @coef FLOAT
+    SET @coef =  CAST(@newLimit AS FLOAT) / @generalCapacity
+    UPDATE Tables
+    SET CurrentCapacity = CAST(MaxCapacity * @coef AS INT)
+END
+
+EXEC ChangeTablesLimit 10
+
+
+DROP PROCEDURE IF EXISTS RemoveTablesLimits
+CREATE PROCEDURE RemoveTablesLimits
+AS
+BEGIN
+    UPDATE Tables
+    SET CurrentCapacity = MaxCapacity
+END
+
+EXEC RemoveTablesLimits
