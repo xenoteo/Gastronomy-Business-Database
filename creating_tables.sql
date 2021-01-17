@@ -95,7 +95,7 @@ CREATE TABLE Menu(
     ArrangementDate DATETIME NOT NULL,
     StartDate DATETIME NOT NULL,
     EndDate DATETIME NOT NULL,
-    CHECK(ArrangementDate <= StartDate),
+    CHECK(ArrangementDate < StartDate),
     CHECK(StartDate < EndDate)
 )
 
@@ -136,7 +136,7 @@ IF OBJECT_ID('MenuDishes', 'U') IS NOT NULL
  DROP TABLE MenuDishes
 CREATE TABLE MenuDishes (
     MenuID INT NOT NULL FOREIGN KEY REFERENCES Menu(MenuID),
-    DishID INT FOREIGN KEY REFERENCES Dishes(DishID),
+    DishID INT NOT NULL FOREIGN KEY REFERENCES Dishes(DishID),
     IsAvailable BIT NOT NULL DEFAULT 1
 )
 
