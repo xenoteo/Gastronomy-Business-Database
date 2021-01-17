@@ -43,7 +43,8 @@ BEGIN
 	FROM Orders
 	INNER JOIN OrderDetails
 	ON Orders.OrderID = OrderDetails.OrderID
-	WHERE Orders.CustomerID = @CustomerID AND OrderDetails.UnitPrice >= @Money;
+	WHERE Orders.CustomerID = @CustomerID AND OrderDetails.UnitPrice >= @Money
+	GROUP BY Orders.OrderID;
 	IF (@OrderNumber IS NULL)
 		SET @OrderNumber = 0;
 	RETURN @OrderNumber;
@@ -59,11 +60,14 @@ RETURNS FLOAT
 AS
 BEGIN
 	DECLARE @Worth INT
-	SELECT @Worth = SUM(OrderDetails.UnitPrice)
-	FROM OrderDetails
-	INNER JOIN Orders
-	ON Orders.OrderID = OrderDetails.OrderID
-	WHERE Orders.CustomerID = @CustomerID;
+	SELECT @Worth = SUM(OrderDetails.UnitPrice * OrderDetails.Quantity * (1 - ISNULL(Discounts.Value, 0)))
+	FROM Orders
+	INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+	LEFT JOIN OrderDiscounts ON Orders.OrderID = OrderDiscounts.OrderID
+    LEFT JOIN Discounts ON OrderDiscounts.DiscountID = Discounts.DiscountID
+	WHERE Orders.CustomerID = @CustomerID
+	GROUP BY Orders.OrderID;
+
 	IF (@Worth IS NULL)
 		SET @Worth = 0;
 	RETURN @Worth;
@@ -74,20 +78,19 @@ SELECT dbo.CustomerOrderWorth(4) AS OrdersWorth
 
 DROP FUNCTION IF EXISTS CustomerMonthOrdersNumber
 CREATE FUNCTION CustomerMonthOrdersNumber
-	(@CustomerID INT, @Month INT)
+	(@CustomerID INT, @Month INT, @Year INT)
 RETURNS INT
 AS
 BEGIN
 	DECLARE @OrdersNumber INT
 	SELECT @OrdersNumber = COUNT(Orders.OrderID) FROM Orders
-	WHERE MONTH(OrderDate) = @Month AND CustomerID = @CustomerID
+	WHERE MONTH(OrderDate) = @Month AND YEAR(OrderDate) = @Year AND CustomerID = @CustomerID
 	IF (@OrdersNumber IS NULL)
 		SET @OrdersNumber = 0
 	RETURN @OrdersNumber
 END
 
-SELECT dbo.CustomerMonthOrdersNumber(4, 1)
-SELECT dbo.CustomerMonthOrdersNumber(4, 1)
+SELECT dbo.CustomerMonthOrdersNumber(4, 1, 2021)
 
 
 DROP FUNCTION IF EXISTS MenuReport
