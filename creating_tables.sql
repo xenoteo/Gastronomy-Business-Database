@@ -99,6 +99,13 @@ CREATE TABLE Menu(
     CHECK(StartDate < EndDate)
 )
 
+ALTER TABLE Menu
+ADD CHECK (DATEDIFF(day, ArrangementDate, StartDate) >= 1)
+
+ALTER TABLE Menu
+ADD CHECK (DATEDIFF(week, StartDate, EndDate) <= 2)
+
+
 IF OBJECT_ID('ProductCategories', 'U') IS NOT NULL
  DROP TABLE ProductCategories
     CREATE TABLE ProductCategories(
