@@ -121,9 +121,9 @@ END
 
 SELECT dbo.CustomerQuarterWorth(4, 1)
 
-DROP FUNCTION IF EXISTS ReservatiONReport
+DROP FUNCTION IF EXISTS ReservationReport
 GO
-CREATE FUNCTION ReservatiONReport
+CREATE FUNCTION ReservationReport
 	(@StartDate DATETIME, @EndDate DATETIME)
 RETURNS TABLE
 AS
@@ -134,7 +134,7 @@ RETURN
 	WHERE RealizatiONDate >= @StartDate AND RealizatiONDate <= @EndDate
 );
 
-SELECT * FROM ReservatiONReport('2021-01-17', '2021-03-15')
+SELECT * FROM ReservationReport('2021-01-17', '2021-03-15')
 
 
 DROP FUNCTION IF EXISTS MenuReport
