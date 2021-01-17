@@ -96,6 +96,10 @@ CREATE PROCEDURE AddNewOrder
 	@IsTakeAway bit = 1
 AS
 BEGIN
+	IF (SELECT COUNT(EmployeeID) FROM Employees WHERE EmployeeID = @EmployeeID) < 1
+		THROW 50001, 'No such employee.', 1
+	IF (SELECT COUNT(CustomerID) FROM Customers WHERE CustomerID = @CustomerID) < 1
+		THROW 50002, 'No such customer.', 1
 	INSERT INTO Orders (EmployeeID, CustomerID, OrderDate, RequiredRealisationDate, PickUpDate, IsTakeAway)
 	VALUES (@EmployeeID, @CustomerID, @OrderDate, @RequiredRealisationDate, @PickUpDate, @IsTakeAway)
 END
@@ -112,6 +116,10 @@ CREATE PROCEDURE AddNewOrderDetails
 	@Quantity int = 1
 AS
 BEGIN
+	IF (SELECT COUNT(OrderID) FROM Orders WHERE OrderID = @OrderID) < 1
+		THROW 50001, 'No such order.', 1
+	IF (SELECT COUNT(DishID) FROM Dishes WHERE DishID = @DishID) < 1
+		THROW 50002, 'No such dish.', 1
 	INSERT INTO OrderDetails (OrderID, DishID, UnitPrice, Quantity)
 	VALUES (@OrderID, @DishID, @UnitPrice, @Quantity)
 END
@@ -142,6 +150,8 @@ CREATE PROCEDURE AddNewProduct
 	@UnitsInStock int = 0
 AS
 BEGIN
+	IF (SELECT COUNT(ProductCategoryID) FROM ProductCategories WHERE ProductCategoryID = @ProductCategoryID) < 1
+		THROW 50001, 'No such product category', 1
 	INSERT INTO Products (ProductName, ProductCategoryID, UnitsInStock)
 	VALUES (@Name, @ProductCategoryID, @UnitsInStock)
 END
@@ -170,6 +180,10 @@ CREATE PROCEDURE AddProductToDish
 	@DishID int
 AS
 BEGIN
+	IF (SELECT COUNT(ProductID) FROM Products WHERE ProductID = @ProductID) < 1
+		THROW 50001, 'No such product.', 1
+	IF (SELECT COUNT(DishID) FROM Dishes WHERE DishID = @DishID) < 1
+		THROW 50002, 'No such dish.', 1
 	INSERT INTO DishDetails (ProductID, DishID)
 	VALUES (@ProductID, @DishID)
 END
