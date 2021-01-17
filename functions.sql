@@ -18,6 +18,19 @@ END
 
 SELECT * FROM FreeTables('2021-01-27', '2021-02-01')
 
+DROP FUNCTION IF EXISTS CustomerDiscounts
+CREATE FUNCTION CustomerDiscounts
+	(@CustomerID INT)
+RETURNS TABLE
+AS
+RETURN
+(
+	SELECT * FROM Discounts
+	WHERE CustomerID = @CustomerID
+);
+
+select * from CustomerDiscounts(4)
+
 
 DROP FUNCTION IF EXISTS CustomerOrdersNumber
 CREATE FUNCTION CustomerOrdersNumber
@@ -59,29 +72,22 @@ END
 SELECT dbo.CustomerOrderWorth(4) AS OrdersWorth
 
 
-DROP FUNCTION IF EXISTS CustomerOrders
-CREATE FUNCTION CustomerOrders
-    (@CustomerID INT)
-RETURNS @Stats TABLE
-    (
-        Date DATETIME,
-        Worth FLOAT
-    )
+DROP FUNCTION IF EXISTS CustomerMonthOrdersNumber
+CREATE FUNCTION CustomerMonthOrdersNumber
+	(@CustomerID INT, @Month INT)
+RETURNS INT
 AS
 BEGIN
-    INSERT INTO @Stats
-    SELECT OrderDate, SUM(UnitPrice * Quantity * (1 - ISNULL(Value, 0)))
-    FROM Customers C
-    INNER JOIN Orders O ON C.CustomerID = O.CustomerID
-    INNER JOIN OrderDetails ODet ON O.OrderID = ODet.OrderID
-    LEFT JOIN OrderDiscounts ODisc ON O.OrderID = ODisc.OrderID
-    LEFT JOIN Discounts D ON ODisc.DiscountID = D.DiscountID
-    WHERE C.CustomerID = @CustomerID
-    GROUP BY O.OrderID, OrderDate
-    RETURN
+	DECLARE @OrdersNumber INT
+	SELECT @OrdersNumber = COUNT(Orders.OrderID) FROM Orders
+	WHERE MONTH(OrderDate) = @Month AND CustomerID = @CustomerID
+	IF (@OrdersNumber IS NULL)
+		SET @OrdersNumber = 0
+	RETURN @OrdersNumber
 END
 
-SELECT * FROM CustomerOrders(4)
+SELECT dbo.CustomerMonthOrdersNumber(4, 1)
+SELECT dbo.CustomerMonthOrdersNumber(4, 1)
 
 
 DROP FUNCTION IF EXISTS MenuReport
@@ -108,3 +114,28 @@ BEGIN
 END
 
 SELECT * FROM MenuReport('2021-01-15', '2021-02-01')
+
+
+DROP FUNCTION IF EXISTS CustomerOrders
+CREATE FUNCTION CustomerOrders
+    (@CustomerID INT)
+RETURNS @Stats TABLE
+    (
+        Date DATETIME,
+        Worth FLOAT
+    )
+AS
+BEGIN
+    INSERT INTO @Stats
+    SELECT OrderDate, SUM(UnitPrice * Quantity * (1 - ISNULL(Value, 0)))
+    FROM Customers C
+    INNER JOIN Orders O ON C.CustomerID = O.CustomerID
+    INNER JOIN OrderDetails ODet ON O.OrderID = ODet.OrderID
+    LEFT JOIN OrderDiscounts ODisc ON O.OrderID = ODisc.OrderID
+    LEFT JOIN Discounts D ON ODisc.DiscountID = D.DiscountID
+    WHERE C.CustomerID = @CustomerID
+    GROUP BY O.OrderID, OrderDate
+    RETURN
+END
+
+SELECT * FROM CustomerOrders(4)
