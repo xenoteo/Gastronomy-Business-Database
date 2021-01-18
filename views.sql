@@ -10,7 +10,9 @@ DROP VIEW IF EXISTS CurrentMenu
 GO
 CREATE VIEW CurrentMenu
 AS
-SELECT * FROM Menu
+SELECT M.MenuID, ArrangementDate, StartDate, EndDate, DishName, UnitPrice, D.IsAvailable FROM Menu M
+INNER JOIN MenuDishes MD on M.MenuID = MD.MenuID
+INNER JOIN Dishes D on D.DishID = MD.DishID
 WHERE StartDate <= GETDATE() AND GETDATE() <= EndDate
 
 
@@ -18,11 +20,9 @@ DROP VIEW IF EXISTS UpcomingReservations
 GO
 CREATE VIEW UpcomingReservations
 AS
-SELECT ReservationID, CustomerID, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson from Reservations 
+SELECT ReservationID, CustomerID, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson FROM Reservations
 WHERE IsCancelled = 0 AND RealizationDateStart >= GETDATE()
-GO
 
-SELECT * FROM UpcomingReservations
 
 DROP VIEW IF EXISTS OccupiedTablesNow
 GO

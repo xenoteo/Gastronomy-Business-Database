@@ -126,7 +126,7 @@ CREATE TABLE Dishes (
     DishID INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
     DishName VARCHAR(50) NOT NULL UNIQUE,
     UnitPrice FLOAT NOT NULL CHECK(UnitPrice >= 0 AND UnitPrice <= 5000),
-    isAvailable BIT NOT NULL DEFAULT 1
+    IsAvailable BIT NOT NULL DEFAULT 1
 )
 
 IF OBJECT_ID('DishDetails', 'U') IS NOT NULL
