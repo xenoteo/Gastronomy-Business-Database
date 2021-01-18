@@ -68,8 +68,8 @@ IF OBJECT_ID('Tables', 'U') IS NOT NULL
     DROP TABLE Tables
 CREATE TABLE Tables(
     TableID INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
-    MaxCapacity INT NOT NULL CHECK (MaxCapacity > 0 AND MaxCapacity <= 100),
-    CurrentCapacity INT NOT NULL CHECK (CurrentCapacity > 0 AND CurrentCapacity <= 100),
+    MaxCapacity INT NOT NULL CHECK (MaxCapacity >= 2 AND MaxCapacity <= 100),
+    CurrentCapacity INT NOT NULL CHECK (CurrentCapacity >= 2 AND CurrentCapacity <= 100),
     CHECK (CurrentCapacity <= MaxCapacity)
 )
 
