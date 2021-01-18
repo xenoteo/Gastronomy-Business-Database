@@ -10,7 +10,9 @@ DROP VIEW IF EXISTS CurrentMenu
 GO
 CREATE VIEW CurrentMenu
 AS
-SELECT * FROM Menu
+SELECT M.MenuID, ArrangementDate, StartDate, EndDate, DishName, UnitPrice, D.IsAvailable FROM Menu M
+INNER JOIN MenuDishes MD on M.MenuID = MD.MenuID
+INNER JOIN Dishes D on D.DishID = MD.DishID
 WHERE StartDate <= GETDATE() AND GETDATE() <= EndDate
 
 
@@ -18,18 +20,17 @@ DROP VIEW IF EXISTS UpcomingReservations
 GO
 CREATE VIEW UpcomingReservations
 AS
-SELECT ReservationID, Reservations.CustomerID, (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson from Reservations 
+SELECT ReservationID, Reservations.CustomerID, (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson from Reservations
 INNER JOIN Customers ON Customers.CustomerID = Reservations.CustomerID
 INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
 INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.CustomerID
 WHERE IsCancelled = 0 AND RealizationDateStart >= GETDATE()
-GO
 
 DROP VIEW IF EXISTS MonthReservationsReport
 GO
 CREATE VIEW MonthReservationsReport
 AS
-SELECT ReservationID, Reservations.CustomerID, (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson from Reservations 
+SELECT ReservationID, Reservations.CustomerID, (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson from Reservations
 INNER JOIN Customers ON Customers.CustomerID = Reservations.CustomerID
 INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
 INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.CustomerID
@@ -40,7 +41,7 @@ DROP VIEW IF EXISTS WeekReservationsReport
 GO
 CREATE VIEW WeekReservationsReport
 AS
-SELECT ReservationID, Reservations.CustomerID, (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson from Reservations 
+SELECT ReservationID, Reservations.CustomerID, (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson from Reservations
 INNER JOIN Customers ON Customers.CustomerID = Reservations.CustomerID
 INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
 INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.CustomerID
