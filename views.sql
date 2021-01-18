@@ -92,6 +92,30 @@ SELECT M.MenuID, ArrangementDate, StartDate, EndDate, DishName, UnitPrice, MD.Is
     WHERE  DATEPART(WEEK,StartDate) = DATEPART(WEEK,GETDATE()) AND MONTH(StartDate) = MONTH(GETDATE()) AND YEAR(GETDATE()) = YEAR(StartDate)
 GO
 
+DROP VIEW IF EXISTS MonthOrderReport
+GO
+CREATE VIEW MonthOrderReport
+AS
+SELECT Orders.OrderID, OrderDate, RequiredRealisationDate, PickUpDate, IsTakeAway, SUM(OrderDetails.UnitPrice * OrderDetails.Quantity * (1 - ISNULL(Discounts.Value, 0))) AS TotalPrice FROM Orders
+INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+LEFT JOIN OrderDiscounts ON Orders.OrderID = OrderDiscounts.OrderID
+LEFT JOIN Discounts ON OrderDiscounts.DiscountID = Discounts.DiscountID
+WHERE MONTH(OrderDate) = MONTH(GETDATE()) AND YEAR(GETDATE()) = YEAR(OrderDate)
+GROUP BY Orders.OrderID, OrderDate, RequiredRealisationDate, PickUpDate, IsTakeAway;
+GO
+
+DROP VIEW IF EXISTS WeekOrderReport
+GO
+CREATE VIEW WeekOrderReport
+AS
+SELECT Orders.OrderID, OrderDate, RequiredRealisationDate, PickUpDate, IsTakeAway, SUM(OrderDetails.UnitPrice * OrderDetails.Quantity * (1 - ISNULL(Discounts.Value, 0))) AS TotalPrice FROM Orders
+INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+LEFT JOIN OrderDiscounts ON Orders.OrderID = OrderDiscounts.OrderID
+LEFT JOIN Discounts ON OrderDiscounts.DiscountID = Discounts.DiscountID
+WHERE DATEPART(WEEK,OrderDate) = DATEPART(WEEK,GETDATE()) AND MONTH(OrderDate) = MONTH(GETDATE()) AND YEAR(GETDATE()) = YEAR(OrderDate)
+GROUP BY Orders.OrderID, OrderDate, RequiredRealisationDate, PickUpDate, IsTakeAway;
+GO
+
 DROP VIEW IF EXISTS OccupiedTablesNow
 GO
 CREATE VIEW OccupiedTablesNow
