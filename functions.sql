@@ -11,9 +11,9 @@ RETURNS @FreeTables TABLE
 AS
 BEGIN
     INSERT INTO @FreeTables
-    SELECT R.TableID, MaxCapacity, CurrentCapacity
-    FROM Reservations R INNER JOIN Tables T ON R.TableID = T.TableID
-    WHERE RealizationDate >= @StartDate AND ReservationDate <= @EndDate
+    SELECT T.TableID, T.MaxCapacity, T.CurrentCapacity FROM Tables T
+    LEFT JOIN Reservations R on T.TableID = R.TableID
+    WHERE RealizationDateStart > @EndDate OR RealizationDateEnd < @StartDate OR RealizationDateStart IS NULL
     RETURN
 END
 
@@ -130,10 +130,10 @@ RETURNS TABLE
 AS
 RETURN
 (
-	SELECT ReservationID, EmployeeID, CustomerID, ReservationDate, RealizationDate, NumberOfPeople, IsCancelled, IsByPerson, Tables.TableID
+	SELECT ReservationID, EmployeeID, CustomerID, ReservationDate, RealizationDateStart, RealizationDateEnd, NumberOfPeople, IsCancelled, IsByPerson, Tables.TableID
 	FROM Reservations
 	INNER JOIN Tables ON Tables.TableID = Reservations.TableID
-	WHERE RealizationDate >= @StartDate AND RealizationDate <= @EndDate
+	WHERE RealizationDateStart >= @StartDate AND RealizationDateEnd <= @EndDate
 )
 
 SELECT * FROM ReservationReport('2021-01-17', '2021-03-15')

@@ -219,7 +219,8 @@ CREATE PROCEDURE AddNewReservation
     @CustomerID INT,
     @EmployeeID INT,
     @NumberOfPeople INT,
-    @RealizationDate DATETIME,
+    @RealizationDateStart DATETIME,
+    @RealizationDateEnd DATETIME,
     @ReservationDate DATETIME,
     @TableID INT,
     @IsCancelled BIT = 0,
@@ -234,11 +235,11 @@ BEGIN
         THROW 50001, 'No such table.', 1
     IF @NumberOfPeople > (SELECT CurrentCapacity FROM Tables WHERE TableID = @TableID)
         THROW 50002, 'Number of people is too big.', 1
-    INSERT INTO Reservations(EmployeeID, CustomerID, ReservationDate, RealizationDate, NumberOfPeople, TableID, IsByPerson, IsCancelled)
-    VALUES (@EmployeeID, @CustomerID, @ReservationDate, @RealizationDate, @NumberOfPeople, @TableID, @IsByPerson, @IsCancelled)
+    INSERT INTO Reservations(EmployeeID, CustomerID, ReservationDate, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson, IsCancelled)
+    VALUES (@EmployeeID, @CustomerID, @ReservationDate, @RealizationDateStart, @RealizationDateEnd, @NumberOfPeople, @TableID, @IsByPerson, @IsCancelled)
 END
 
-EXEC AddNewReservation 5, 1, 3, '2021-01-29', '2021-01-16', 2
+EXEC AddNewReservation 5, 1, 3, '2021-01-29 18:00', '2021-01-29 20:00','2021-01-16', 1
 
 
 DROP PROCEDURE IF EXISTS AddDishToMenu

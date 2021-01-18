@@ -80,12 +80,14 @@ CREATE TABLE Reservations(
     EmployeeID INT NOT NULL FOREIGN KEY REFERENCES Employees(EmployeeID),
     CustomerID INT NOT NULL FOREIGN KEY REFERENCES Customers(CustomerID),
     ReservationDate DATETIME NOT NULL,
-    RealizationDate DATETIME NOT NULL,
+    RealizationDateStart DATETIME NOT NULL,
+    RealizationDateEnd DATETIME NOT NULL,
     NumberOfPeople INT NOT NULL CHECK (NumberOfPeople > 0 AND NumberOfPeople <= 100),
     TableID INT NOT NULL FOREIGN KEY REFERENCES Tables(TableID),
     IsCancelled BIT DEFAULT 0,
     IsByPerson BIT DEFAULT 1,
-    CHECK (ReservationDate <= RealizationDate)
+    CHECK (ReservationDate <= RealizationDateStart),
+    CHECK (RealizationDateStart < RealizationDateEnd)
 )
 
 IF OBJECT_ID('Menu', 'U') IS NOT NULL
