@@ -18,11 +18,78 @@ DROP VIEW IF EXISTS UpcomingReservations
 GO
 CREATE VIEW UpcomingReservations
 AS
-SELECT ReservationID, CustomerID, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson from Reservations 
+SELECT ReservationID, Reservations.CustomerID, (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson from Reservations 
+INNER JOIN Customers ON Customers.CustomerID = Reservations.CustomerID
+INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
+INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.CustomerID
 WHERE IsCancelled = 0 AND RealizationDateStart >= GETDATE()
 GO
 
-SELECT * FROM UpcomingReservations
+DROP VIEW IF EXISTS MonthReservationsReport
+GO
+CREATE VIEW MonthReservationsReport
+AS
+SELECT ReservationID, Reservations.CustomerID, (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson from Reservations 
+INNER JOIN Customers ON Customers.CustomerID = Reservations.CustomerID
+INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
+INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.CustomerID
+WHERE MONTH(RealizationDateStart) = MONTH(GETDATE()) AND YEAR(GETDATE()) = YEAR(RealizationDateStart)
+GO
+
+DROP VIEW IF EXISTS WeekReservationsReport
+GO
+CREATE VIEW WeekReservationsReport
+AS
+SELECT ReservationID, Reservations.CustomerID, (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson from Reservations 
+INNER JOIN Customers ON Customers.CustomerID = Reservations.CustomerID
+INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
+INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.CustomerID
+WHERE DATEPART(WEEK,RealizationDateStart) = DATEPART(WEEK,GETDATE()) AND YEAR(GETDATE()) = YEAR(RealizationDateStart) AND MONTH(RealizationDateStart) = MONTH(GETDATE())
+GO
+
+DROP VIEW IF EXISTS MonthDiscountsReport
+GO
+CREATE VIEW MonthDiscountsReport
+AS
+SELECT DiscountID, Value, Customers.CustomerID, (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.CompanyName ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS CustomerName, IssueDate, DueDate, IsOneTime, IsAvailable FROM Discounts
+INNER JOIN Customers ON Customers.CustomerID = Discounts.CustomerID
+INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
+INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.CustomerID
+WHERE MONTH(IssueDate) = MONTH(GETDATE()) AND YEAR(GETDATE()) = YEAR(IssueDate)
+GO
+
+DROP VIEW IF EXISTS WeekDiscountsReport
+GO
+CREATE VIEW WeekDiscountsReport
+AS
+SELECT DiscountID, Value, Customers.CustomerID, (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.CompanyName ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS CustomerName, IssueDate, DueDate, IsOneTime, IsAvailable FROM Discounts
+INNER JOIN Customers ON Customers.CustomerID = Discounts.CustomerID
+INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
+INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.CustomerID
+WHERE DATEPART(WEEK,IssueDate) = DATEPART(WEEK,GETDATE()) AND MONTH(IssueDate) = MONTH(GETDATE()) AND YEAR(GETDATE()) = YEAR(IssueDate)
+GO
+
+DROP VIEW IF EXISTS MonthMenuReport
+GO
+CREATE VIEW MonthMenuReport
+AS
+SELECT M.MenuID, ArrangementDate, StartDate, EndDate, DishName, UnitPrice, MD.IsAvailable
+    FROM Menu M
+    INNER JOIN MenuDishes MD ON M.MenuID = MD.MenuID
+    INNER JOIN Dishes D ON D.DishID = MD.DishID
+    WHERE MONTH(StartDate) = MONTH(GETDATE()) AND YEAR(GETDATE()) = YEAR(StartDate)
+GO
+
+DROP VIEW IF EXISTS WeekMenuReport
+GO
+CREATE VIEW WeekMenuReport
+AS
+SELECT M.MenuID, ArrangementDate, StartDate, EndDate, DishName, UnitPrice, MD.IsAvailable
+    FROM Menu M
+    INNER JOIN MenuDishes MD ON M.MenuID = MD.MenuID
+    INNER JOIN Dishes D ON D.DishID = MD.DishID
+    WHERE  DATEPART(WEEK,StartDate) = DATEPART(WEEK,GETDATE()) AND MONTH(StartDate) = MONTH(GETDATE()) AND YEAR(GETDATE()) = YEAR(StartDate)
+GO
 
 DROP VIEW IF EXISTS OccupiedTablesNow
 GO
