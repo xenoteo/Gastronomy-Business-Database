@@ -215,3 +215,17 @@ BEGIN
 END
 
 SELECT * FROM CustomerOrders(4)
+
+DROP FUNCTION IF EXISTS LastMonthDishes
+GO
+CREATE FUNCTION LastMonthDishes
+	(@MenuID INT, @month INT, @year INT)
+RETURNS TABLE
+AS
+RETURN
+(
+	SELECT MenuDishes.DishID FROM MenuDishes
+	INNER JOIN Dishes ON MenuDishes.DishID = Dishes.DishID
+	INNER JOIN Menu ON MenuDishes.MenuID = Menu.MenuID
+	WHERE MenuDishes.MenuID = @MenuID AND MONTH(Menu.StartDate) <= @month AND YEAR(Menu.StartDate) = @year
+)
