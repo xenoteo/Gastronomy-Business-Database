@@ -678,3 +678,36 @@ BEGIN
 END
 
 EXEC UseOneTimeDiscount 1
+
+
+DROP PROCEDURE IF EXISTS ChangeDiscountValue
+GO
+CREATE PROCEDURE ChangeDiscountValue
+	@DiscountID INT,
+    @NewValue FLOAT
+AS
+BEGIN
+	IF (SELECT COUNT(DiscountID) FROM Discounts WHERE DiscountID = @DiscountID) < 1
+		THROW 50001, 'No such discount.', 1
+	UPDATE Discounts
+	SET Value = @NewValue
+	WHERE DiscountID = @DiscountID
+END
+
+EXEC ChangeDiscountValue 1, 0.33
+
+
+DROP PROCEDURE IF EXISTS DeactivateDiscount
+GO
+CREATE PROCEDURE DeactivateDiscount
+	@DiscountID INT
+AS
+BEGIN
+	IF (SELECT COUNT(DiscountID) FROM Discounts WHERE DiscountID = @DiscountID) < 1
+		THROW 50001, 'No such discount.', 1
+	UPDATE Discounts
+	SET IsAvailable = 0
+	WHERE DiscountID = @DiscountID
+END
+
+EXEC DeactivateDiscount 1
