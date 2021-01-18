@@ -166,6 +166,31 @@ END
 SELECT * FROM MenuReport('2021-01-15', '2021-02-01')
 
 
+DROP FUNCTION IF EXISTS DiscountReport
+GO
+CREATE FUNCTION DiscountReport
+    (@StartDate DATETIME, @EndDate DATETIME)
+RETURNS @Report TABLE
+    (
+        DiscountID INT,
+        CustomerID INT,
+        Value FLOAT,
+        DueDate DATETIME,
+        IssueDate DATETIME,
+        IsOneTime BIT,
+        IsAvailable BIT
+    )
+AS
+BEGIN
+    INSERT INTO @Report
+    SELECT * FROM Discounts
+    WHERE IssueDate >= @StartDate AND IssueDate <= @EndDate
+    RETURN
+END
+
+SELECT * FROM DiscountReport('2021-01-15', '2021-02-01')
+
+
 DROP FUNCTION IF EXISTS CustomerOrders
 GO
 CREATE FUNCTION CustomerOrders
