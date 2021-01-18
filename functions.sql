@@ -35,27 +35,48 @@ RETURN
 SELECT * FROM CustomerDiscounts(4)
 
 
-DROP FUNCTION IF EXISTS CustomerOrdersNumber
+DROP FUNCTION IF EXISTS CustomerOrdersNumberForValue
 GO
-CREATE FUNCTION CustomerOrdersNumber
+CREATE FUNCTION CustomerOrdersNumberForValue
 	(@CustomerID INT, @Money FLOAT)
 RETURNS INT
 AS
 BEGIN
 	DECLARE @OrderNumber INT
-	SELECT @OrderNumber = COUNT(Orders.OrderID)
-	FROM Orders
-	INNER JOIN OrderDetails
-	on Orders.OrderID = OrderDetails.OrderID
-	WHERE Orders.CustomerID = @CustomerID AND OrderDetails.UnitPrice >= @Money
+	SELECT @OrderNumber = COUNT(Orders.OrderID) FROM Orders
+	INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
+	LEFT JOIN OrderDiscounts ON Orders.OrderID = OrderDiscounts.OrderID
+    LEFT JOIN Discounts ON OrderDiscounts.DiscountID = Discounts.DiscountID
+	WHERE Orders.CustomerID = @CustomerID
+	GROUP BY Orders.OrderID
+	HAVING SUM(OrderDetails.UnitPrice * OrderDetails.Quantity * (1 - ISNULL(Discounts.Value, 0))) >= @Money;
+	IF (@OrderNumber IS NULL)
+		SET @OrderNumber = 0;
+	RETURN @OrderNumber;
+END
+GO
+
+SELECT dbo.CustomerOrdersNumberForValue(4, 20.0) AS OrdersNumber
+
+
+DROP FUNCTION IF EXISTS CustomerOrdersNumber
+GO
+CREATE FUNCTION CustomerOrdersNumber
+	(@CustomerID INT)
+RETURNS INT
+AS
+BEGIN
+	DECLARE @OrderNumber INT
+	SELECT @OrderNumber = COUNT(Orders.OrderID) FROM Orders
+	WHERE Orders.CustomerID = @CustomerID
 	GROUP BY Orders.OrderID;
 	IF (@OrderNumber IS NULL)
 		SET @OrderNumber = 0;
 	RETURN @OrderNumber;
 END
+GO
 
-SELECT dbo.CustomerOrdersNumber(4, 20.0) AS OrdersNumber
-
+SELECT dbo.CustomerOrdersNumber(4)
 
 DROP FUNCTION IF EXISTS CustomerOrderWorth
 GO
@@ -229,3 +250,19 @@ RETURN
 	INNER JOIN Menu ON MenuDishes.MenuID = Menu.MenuID
 	WHERE MenuDishes.MenuID = @MenuID AND MONTH(Menu.StartDate) <= @month AND YEAR(Menu.StartDate) = @year
 )
+
+
+DROP FUNCTION IF EXISTS CanMakeReservation
+GO
+CREATE FUNCTION CanMakeReservation
+	(@customerID INT, @orderValue FLOAT, @lowerLimitValue FLOAT, @previousOrders INT, @elseValue FLOAT)
+RETURNS BIT
+AS
+BEGIN
+	DECLARE @res BIT
+	SELECT @res = (CASE WHEN ((@lowerLimitValue <= @orderValue AND dbo.CustomerOrdersNumber(@customerID) >= @previousOrders) OR (@lowerLimitValue >= @orderValue AND dbo.CustomerOrdersNumberForValue(@customerID, @elseValue) <= @previousOrders)) THEN 1 ELSE 0 END);
+	RETURN @res;
+END
+GO
+select dbo.CanMakeReservation(4, 25, 15, 2, 26)
+select dbo.CanMakeReservation(4, 25, 15, 1, 26)
