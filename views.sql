@@ -14,6 +14,16 @@ SELECT * FROM Menu
 WHERE StartDate <= GETDATE() AND GETDATE() <= EndDate
 
 
+DROP VIEW IF EXISTS UpcomingReservations
+GO
+CREATE VIEW UpcomingReservations
+AS
+SELECT ReservationID, CustomerID, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson from Reservations 
+WHERE IsCancelled = 0 AND RealizationDateStart >= GETDATE()
+GO
+
+SELECT * FROM UpcomingReservations
+
 DROP VIEW IF EXISTS OccupiedTablesNow
 GO
 CREATE VIEW OccupiedTablesNow
