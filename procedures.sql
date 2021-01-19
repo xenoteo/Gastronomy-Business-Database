@@ -21,9 +21,9 @@ CREATE PROCEDURE AddNewCompanyCustomer
     @CompanyName VARCHAR(50),
     @Phone VARCHAR(20),
     @Email VARCHAR(30),
+	@NIP VARCHAR(10),
     @ContactPersonName VARCHAR(50) = NULL,
     @ContactPersonTitle VARCHAR(50) = NULL,
-    @Fax VARCHAR(20) = NULL,
     @Address VARCHAR(50) = NULL,
     @City VARCHAR(30) = NULL,
     @PostalCode VARCHAR(30) = NULL,
@@ -33,12 +33,13 @@ BEGIN
     EXEC AddNewCustomer @Phone, @Email, 1, @Address, @City, @PostalCode, @Country
     DECLARE @CustomerID INT
     SET @CustomerID = (SELECT CustomerID FROM Customers WHERE Email = @Email AND Phone = @Phone)
-    INSERT INTO CompanyCustomers(CustomerID, CompanyName, ContactPersonName, ContactPersonTitle, Fax)
-    VALUES (@CustomerID, @CompanyName, @ContactPersonName, @ContactPersonTitle, @Fax)
+    INSERT INTO CompanyCustomers(CustomerID, CompanyName, ContactPersonName, ContactPersonTitle, NIP)
+    VALUES (@CustomerID, @CompanyName, @ContactPersonName, @ContactPersonTitle, @NIP)
 END
 
-EXEC AddNewCompanyCustomer 'Good Company', '123456789', 'email@Gmail.com'
-EXEC AddNewCompanyCustomer 'Good Company 2', '123456799', 'email2@Gmail.com', @Country = 'Poland'
+EXEC AddNewCompanyCustomer 'Good Company', '123456789', 'email@Gmail.com', '6462933516'
+EXEC AddNewCompanyCustomer 'Good Company 2', '123456799', 'email2@Gmail.com', '1234056789', @Country = 'Poland'
+EXEC AddNewCompanyCustomer 'Motorola', '126445689', 'iamtheboss@motorola.com', '5672345195'
 
 
 DROP PROCEDURE IF EXISTS AddNewIndividualCustomer
@@ -421,7 +422,7 @@ CREATE PROCEDURE ChangeCompanyCustomerData
     @CompanyName VARCHAR(50) = NULL,
     @ContactPersonName VARCHAR(50) = NULL,
     @ContactPersonTitle VARCHAR(50) = NULL,
-    @Fax VARCHAR(20) = NULL,
+    @NIP VARCHAR(10) = NULL,
     @Phone VARCHAR(20) = NULL,
     @Email VARCHAR(30) = NULL,
     @Address VARCHAR(50) = NULL,
@@ -445,9 +446,9 @@ BEGIN
         UPDATE CompanyCustomers
         SET ContactPersonTitle = @ContactPersonTitle
         WHERE CustomerID = @CustomerID
-    IF @Fax IS NOT NULL
+    IF @NIP IS NOT NULL
         UPDATE CompanyCustomers
-        SET Fax = @Fax
+        SET NIP = @NIP
         WHERE CustomerID = @CustomerID
 END
 

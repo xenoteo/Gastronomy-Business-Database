@@ -18,7 +18,7 @@ CREATE TABLE CompanyCustomers(
     CompanyName VARCHAR(50) NOT NULL UNIQUE,
     ContactPersonName VARCHAR(50),
     ContactPersonTitle VARCHAR(50),
-    Fax VARCHAR(20)
+    NIP VARCHAR(10) NOT NULL UNIQUE
 )
 
 IF OBJECT_ID('IndividualCustomers', 'U') IS NOT NULL

@@ -21,7 +21,8 @@ GO
 CREATE VIEW UpcomingReservations
 AS
 SELECT ReservationID, Reservations.CustomerID,
-       (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName
+       (CASE WHEN Customers.IsCompany = 1 THEN (CASE WHEN CompanyCustomers.ContactPersonName IS NOT NULL THEN CompanyCustomers.ContactPersonName 
+													ELSE CompanyCustomers.CompanyName END)
            ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName,
        RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, OrderID, IsByPerson
 FROM Reservations
@@ -29,14 +30,15 @@ INNER JOIN Customers ON Customers.CustomerID = Reservations.CustomerID
 INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
 INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.CustomerID
 WHERE IsCancelled = 0 AND RealizationDateStart >= GETDATE()
-
+GO
 
 DROP VIEW IF EXISTS WeekReservationsReport
 GO
 CREATE VIEW WeekReservationsReport
 AS
 SELECT ReservationID, Reservations.CustomerID,
-       (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName
+       (CASE WHEN Customers.IsCompany = 1 THEN (CASE WHEN CompanyCustomers.ContactPersonName IS NOT NULL THEN CompanyCustomers.ContactPersonName 
+													ELSE CompanyCustomers.CompanyName END)
            ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName,
        RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, OrderID, IsByPerson
 FROM Reservations
@@ -46,14 +48,15 @@ INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.Cus
 WHERE DATEPART(WEEK,RealizationDateStart) = DATEPART(WEEK,GETDATE())
   AND YEAR(GETDATE()) = YEAR(RealizationDateStart)
   AND MONTH(RealizationDateStart) = MONTH(GETDATE())
-
+GO
 
 DROP VIEW IF EXISTS MonthReservationsReport
 GO
 CREATE VIEW MonthReservationsReport
 AS
 SELECT ReservationID, Reservations.CustomerID,
-       (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName
+       (CASE WHEN Customers.IsCompany = 1 THEN (CASE WHEN CompanyCustomers.ContactPersonName IS NOT NULL THEN CompanyCustomers.ContactPersonName 
+													ELSE CompanyCustomers.CompanyName END)
            ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName,
        RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, OrderID, IsByPerson
 FROM Reservations
@@ -61,7 +64,7 @@ INNER JOIN Customers ON Customers.CustomerID = Reservations.CustomerID
 INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
 INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.CustomerID
 WHERE MONTH(RealizationDateStart) = MONTH(GETDATE()) AND YEAR(GETDATE()) = YEAR(RealizationDateStart)
-
+GO
 
 DROP VIEW IF EXISTS WeekDiscountsReport
 GO
