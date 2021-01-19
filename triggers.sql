@@ -87,3 +87,29 @@ BEGIN
 		ROLLBACK TRANSACTION
 	END
 END
+
+GO
+-- nie uruchomilam tego triggera, bo sie boje xdd
+CREATE TRIGGER CanOrderSeafood
+ON Orders
+FOR INSERT
+AS
+BEGIN
+	DECLARE @dishID AS INT
+	SET @dishID = (SELECT DishID FROM OrderDetails
+					INNER JOIN INSERTED i ON i.OrderID = OrderDetails.OrderID)
+	DECLARE @productID AS INT
+	set @productID = (SELECT DishDetails.ProductID FROM DishDetails 
+						INNER JOIN Products ON DishDetails.ProductID = Products.ProductID
+						INNER JOIN ProductCategories ON ProductCategories.ProductCategoryID = Products.ProductCategoryID
+						WHERE DishID = @dishID AND ProductCategoryName = 'Seafood'
+						)
+	IF @productID IS NOT NULL
+	BEGIN
+		IF DATEPART(WEEKDAY, (SELECT i.OrderDate FROM INSERTED AS i)) <> 4 AND DATEPART(WEEKDAY, (SELECT i.OrderDate FROM INSERTED AS i)) <> 5 AND DATEPART(WEEKDAY, (SELECT i.OrderDate FROM INSERTED AS i)) <> 6
+		BEGIN
+			RAISERROR ('Seafood were ordered in a wrong time', -1, -1)
+			ROLLBACK TRANSACTION
+		END
+	END
+END
