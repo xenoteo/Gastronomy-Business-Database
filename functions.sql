@@ -267,3 +267,5 @@ END
 GO
 select dbo.CanMakeReservation(4, 25, 15, 2, 26)
 select dbo.CanMakeReservation(4, 25, 15, 1, 26)
+
+
