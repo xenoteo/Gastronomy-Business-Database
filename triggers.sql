@@ -17,6 +17,51 @@ BEGIN
 END
 GO
 
+CREATE TRIGGER MakeUnavailableDish
+ON Products
+FOR UPDATE
+AS
+BEGIN
+	IF UPDATE(UnitsInStock)
+	BEGIN
+		IF (SELECT UnitsInStock FROM INSERTED) = 0
+		BEGIN 
+			DECLARE @productID AS INT
+			SET @productID = (SELECT i.ProductID FROM INSERTED AS i) 
+			DECLARE @dishID AS INT
+			SET @dishID = (SELECT DishID FROM DishDetails WHERE ProductID = @productID)
+
+			UPDATE Dishes
+			SET isAvailable = 0
+			WHERE DishID = @dishID
+		END
+	END
+END
+go
+
+CREATE TRIGGER MakeAvailableDish
+ON Products
+FOR UPDATE
+AS
+BEGIN
+	IF UPDATE(UnitsInStock)
+	BEGIN
+		IF (SELECT UnitsInStock FROM INSERTED) > 0
+		BEGIN 
+			DECLARE @productID AS INT
+			SET @productID = (SELECT i.ProductID FROM INSERTED AS i) 
+			DECLARE @dishID AS INT
+			SET @dishID = (SELECT DishID FROM DishDetails WHERE ProductID = @productID)
+
+			UPDATE Dishes
+			SET isAvailable = 1
+			WHERE DishID = @dishID
+		END
+	END
+END
+
+
+
 CREATE TRIGGER ChangeMenuEndDateTrigger
 ON Menu
 FOR INSERT, UPDATE AS
