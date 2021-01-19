@@ -90,6 +90,17 @@ CREATE TABLE Reservations(
     CHECK (RealizationDateStart < RealizationDateEnd)
 )
 
+ALTER TABLE Reservations 
+ADD OrderID INT
+
+ALTER TABLE Reservations 
+ALTER COLUMN OrderID INT NOT NULL
+
+ALTER TABLE Reservations
+ADD CONSTRAINT FK_OrderID
+FOREIGN KEY (OrderID) REFERENCES Orders(OrderID);
+
+
 IF OBJECT_ID('Menu', 'U') IS NOT NULL
  DROP TABLE Menu
 CREATE TABLE Menu(

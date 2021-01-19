@@ -23,7 +23,7 @@ AS
 SELECT ReservationID, Reservations.CustomerID,
        (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName
            ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName,
-       RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson
+       RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, OrderID, IsByPerson
 FROM Reservations
 INNER JOIN Customers ON Customers.CustomerID = Reservations.CustomerID
 INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
@@ -38,7 +38,7 @@ AS
 SELECT ReservationID, Reservations.CustomerID,
        (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName
            ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName,
-       RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson
+       RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, OrderID, IsByPerson
 FROM Reservations
 INNER JOIN Customers ON Customers.CustomerID = Reservations.CustomerID
 INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
@@ -55,7 +55,7 @@ AS
 SELECT ReservationID, Reservations.CustomerID,
        (CASE WHEN Customers.IsCompany = 1 THEN CompanyCustomers.ContactPersonName
            ELSE IndividualCustomers.FirstName + ' ' +IndividualCustomers.LastName END) AS ContactName,
-       RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson
+       RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, OrderID, IsByPerson
 FROM Reservations
 INNER JOIN Customers ON Customers.CustomerID = Reservations.CustomerID
 INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID

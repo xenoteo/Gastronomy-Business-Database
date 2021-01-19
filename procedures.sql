@@ -218,6 +218,7 @@ GO
 CREATE PROCEDURE AddNewReservation
     @CustomerID INT,
     @EmployeeID INT,
+	@OrderID INT,
     @NumberOfPeople INT,
     @RealizationDateStart DATETIME,
     @RealizationDateEnd DATETIME,
@@ -235,11 +236,13 @@ BEGIN
         THROW 50001, 'No such table.', 1
     IF @NumberOfPeople > (SELECT CurrentCapacity FROM Tables WHERE TableID = @TableID)
         THROW 50002, 'Number of people is too big.', 1
-    INSERT INTO Reservations(EmployeeID, CustomerID, ReservationDate, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson, IsCancelled)
-    VALUES (@EmployeeID, @CustomerID, @ReservationDate, @RealizationDateStart, @RealizationDateEnd, @NumberOfPeople, @TableID, @IsByPerson, @IsCancelled)
+	IF (SELECT COUNT(OrderID) FROM Orders WHERE OrderID = @OrderID) < 1
+        THROW 50001, 'No such order.', 1
+    INSERT INTO Reservations(EmployeeID, CustomerID, ReservationDate, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson, IsCancelled, OrderID)
+    VALUES (@EmployeeID, @CustomerID, @ReservationDate, @RealizationDateStart, @RealizationDateEnd, @NumberOfPeople, @TableID, @IsByPerson, @IsCancelled, @OrderID)
 END
 
-EXEC AddNewReservation 5, 1, 3, '2021-01-29 18:00', '2021-01-29 20:00','2021-01-16', 1
+EXEC AddNewReservation 5, 1, 1, 3, '2021-01-29 18:00', '2021-01-29 20:00','2021-01-16', 1
 
 
 DROP PROCEDURE IF EXISTS AddDishToMenu
@@ -365,8 +368,7 @@ BEGIN
     WHERE ReservationID = @ReservationID
 END
 
-EXEC ChangeTableParticipants 1, 6
-
+EXEC ChangeTableParticipants 3, 6
 
 DROP PROCEDURE IF EXISTS ChangeCustomerData
 GO
@@ -573,8 +575,7 @@ BEGIN
     WHERE ReservationID = @ReservationID
 END
 
-EXEC CancelReservation 1
-
+EXEC CancelReservation 3
 
 DROP PROCEDURE IF EXISTS CancelOrder
 GO

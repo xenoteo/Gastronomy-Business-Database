@@ -151,9 +151,10 @@ RETURNS TABLE
 AS
 RETURN
 (
-	SELECT ReservationID, EmployeeID, CustomerID, ReservationDate, RealizationDateStart, RealizationDateEnd, NumberOfPeople, IsCancelled, IsByPerson, Tables.TableID
+	SELECT ReservationID, Reservations.EmployeeID, Reservations.CustomerID, Orders.OrderID, ReservationDate, RealizationDateStart, RealizationDateEnd, NumberOfPeople, IsCancelled, IsByPerson, Tables.TableID
 	FROM Reservations
 	INNER JOIN Tables ON Tables.TableID = Reservations.TableID
+	INNER JOIN Orders ON Orders.OrderID = Reservations.OrderID
 	WHERE RealizationDateStart >= @StartDate AND RealizationDateEnd <= @EndDate
 )
 
