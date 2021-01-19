@@ -15,3 +15,13 @@ BEGIN
 		END
 	END
 END
+GO
+
+CREATE TRIGGER ChangeMenuEndDateTrigger
+ON Menu
+FOR INSERT, UPDATE AS
+BEGIN
+	UPDATE Menu
+	SET EndDate = DATEADD(WEEK, 2, StartDate)
+	WHERE EndDate > DATEADD(WEEK, 2, StartDate)
+END
