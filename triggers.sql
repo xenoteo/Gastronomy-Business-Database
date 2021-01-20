@@ -96,3 +96,28 @@ BEGIN
 		END
 	END
 END
+
+
+DROP TRIGGER IF EXISTS individualCustomerTrigger
+GO
+CREATE TRIGGER individualCustomerTrigger
+ON IndividualCustomers
+FOR INSERT 
+AS
+BEGIN
+	UPDATE dbo.Customers
+	SET IsCompany = 0
+	WHERE CustomerID = (SELECT CustomerID FROM Inserted)
+END
+
+DROP TRIGGER IF EXISTS companyCustomerTrigger
+GO
+CREATE TRIGGER companyCustomerTrigger
+ON CompanyCustomers
+FOR INSERT 
+AS
+BEGIN
+	UPDATE dbo.Customers
+	SET IsCompany = 1
+	WHERE CustomerID = (SELECT CustomerID FROM Inserted)
+END
