@@ -773,15 +773,20 @@ BEGIN
     SET @MonthOrdersNumber = dbo.CustomerMonthOrdersNumberOfGivenValue(@CustomerID, @FK1, @Date)
     IF @MonthOrdersNumber >= @FZ
         BEGIN
-            DECLARE @OldDiscount FLOAT
-            SET @OldDiscount = (SELECT Value FROM Discounts
-                WHERE CustomerID = @CustomerID AND IsAvailable = 1 AND IsOneTime = 0)
-            DECLARE @NewDiscount FLOAT
-            SET @NewDiscount = @OldDiscount + @FR1
-            SET @NewDiscount = IIF((@NewDiscount > @FM), @FM, @NewDiscount)
-            EXEC ChangeDiscountValue @DiscountID, @NewDiscount
+            IF @DiscountID IS NULL
+                    EXEC AddNewDiscount @CustomerID, @FR1, @Date, @IsOneTime = 0
+            ELSE
+                BEGIN
+                    DECLARE @OldDiscount FLOAT
+                    SET @OldDiscount = (SELECT Value FROM Discounts
+                        WHERE CustomerID = @CustomerID AND IsAvailable = 1 AND IsOneTime = 0)
+                    DECLARE @NewDiscount FLOAT
+                    SET @NewDiscount = @OldDiscount + @FR1
+                    SET @NewDiscount = IIF((@NewDiscount > @FM), @FM, @NewDiscount)
+                    EXEC ChangeDiscountValue @DiscountID, @NewDiscount
+                END
         END
-    ELSE IF @MonthOrdersNumber = 0
+    ELSE IF @MonthOrdersNumber = 0 AND @DiscountID IS NOT NULL
         BEGIN
             EXEC ChangeDiscountValue @DiscountID, 0
         END
@@ -791,7 +796,7 @@ BEGIN
     DECLARE @QuarterWorth INT
     SET @QuarterWorth = dbo.CustomerQuarterWorth(@CustomerID, @Quarter)
     IF @QuarterWorth >= @FK2
-        EXEC AddNewDiscount @DiscountID, @FR2, @Date
+        EXEC AddNewDiscount @CustomerID, @FR2, @Date
 END
 
 EXEC TryAssignNewDiscountToCompanyCustomer 1, 5, 500, 0.001, 0.04, 10000, 0.05
