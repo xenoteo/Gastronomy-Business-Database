@@ -721,12 +721,12 @@ CREATE PROCEDURE TryAssignNewDiscountToIndividualCustomer
     @CustomerID INT,
     @Z1 INT,
     @K1 INT,
-    @R1 INT,
+    @R1 FLOAT,
     @K2 INT,
-    @R2 INT,
+    @R2 FLOAT,
     @D1 INT,
     @K3 INT,
-    @R3 INT,
+    @R3 FLOAT,
     @D2 INT
 AS
 BEGIN
@@ -747,4 +747,47 @@ BEGIN
             SET @DueDate = DATEADD(DAY, @D2, @Date)
             EXEC AddNewDiscount @CustomerID, @R3, @Date, @DueDate = @DueDate
         END
+END
+
+
+DROP PROCEDURE IF EXISTS TryAssignNewDiscountToIndividualCustomer
+GO
+CREATE PROCEDURE TryAssignNewDiscountToIndividualCustomer
+    @CustomerID INT,
+    @FZ INT,
+    @FK1 INT,
+    @FR1 FLOAT,
+    @FM FLOAT,
+    @FK2 INT,
+    @FR2 FLOAT
+AS
+BEGIN
+    DECLARE @Date DATETIME
+    SET @Date = GETDATE()
+    DECLARE @DiscountID INT
+    SET @DiscountID = (SELECT DiscountID FROM Discounts
+        WHERE CustomerID = @CustomerID AND IsAvailable = 1 AND IsOneTime = 0)
+    DECLARE @MonthOrdersNumber INT
+    SET @MonthOrdersNumber = dbo.CustomerMonthOrdersNumberOfGivenValue(@CustomerID, @FK1, @Date)
+    IF @MonthOrdersNumber >= @FZ
+        BEGIN
+            DECLARE @OldDiscount FLOAT
+            SET @OldDiscount = (SELECT Value FROM Discounts
+                WHERE CustomerID = @CustomerID AND IsAvailable = 1 AND IsOneTime = 0)
+            DECLARE @NewDiscount FLOAT
+            SET @NewDiscount = @OldDiscount + @FR1
+            SET @NewDiscount = IIF((@NewDiscount > @FM), @FM, @NewDiscount)
+            EXEC ChangeDiscountValue @DiscountID, @NewDiscount
+        END
+    ELSE IF @MonthOrdersNumber = 0
+        BEGIN
+            EXEC DeactivateDiscount @DiscountID
+        END
+
+    DECLARE @Quarter INT
+    SET @Quarter = DATEPART(quarter, @Date)
+    DECLARE @QuarterWorth INT
+    SET @QuarterWorth = dbo.CustomerQuarterWorth(@CustomerID, @Quarter)
+    IF @QuarterWorth >= @FK2
+        EXEC AddNewDiscount @DiscountID, @FR2, @Date
 END

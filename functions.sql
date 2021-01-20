@@ -361,3 +361,26 @@ BEGIN
 END
 
 SELECT dbo.CustomerHasNOrdersOfGivenValue(4, 1, 10)
+
+
+DROP FUNCTION IF EXISTS CustomerMonthOrdersNumberOfGivenValue
+GO
+CREATE FUNCTION CustomerMonthOrdersNumberOfGivenValue
+    (@CustomerID INT, @Value INT, @PeriodEndDate DATETIME)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @PeriodStartDate DATETIME
+    SET @PeriodStartDate = DATEADD(month, -1, @PeriodEndDate)
+    DECLARE @OrdersNumber INT
+    SET @OrdersNumber = (SELECT COUNT(O.OrderID) FROM Orders O
+        INNER JOIN OrderDetails ODet ON O.OrderID = ODet.OrderID
+        LEFT JOIN OrderDiscounts ODis ON ODet.OrderID = ODis.OrderID
+        LEFT JOIN Discounts D ON ODis.DiscountID = D.DiscountID
+            WHERE O.CustomerID = @CustomerID AND @PeriodStartDate <= OrderDate AND OrderDate <= @PeriodEndDate
+        HAVING SUM(Quantity * UnitPrice * (1 - ISNULL(Value, 0))) > @Value
+        )
+    RETURN @OrdersNumber
+END
+
+SELECT dbo.CustomerMonthOrdersNumberOfGivenValue(4, 10, '2021-01-20')
