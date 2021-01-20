@@ -238,10 +238,11 @@ END
 
 SELECT * FROM CustomerOrders(4)
 
-DROP FUNCTION IF EXISTS LastMonthDishes
+
+DROP FUNCTION IF EXISTS MonthDishes
 GO
-CREATE FUNCTION LastMonthDishes
-	(@MenuID INT, @month INT, @year INT)
+CREATE FUNCTION MonthDishes
+	(@MenuID INT, @Month INT, @Year INT)
 RETURNS TABLE
 AS
 RETURN
@@ -249,23 +250,93 @@ RETURN
 	SELECT MenuDishes.DishID FROM MenuDishes
 	INNER JOIN Dishes ON MenuDishes.DishID = Dishes.DishID
 	INNER JOIN Menu ON MenuDishes.MenuID = Menu.MenuID
-	WHERE MenuDishes.MenuID = @MenuID AND MONTH(Menu.StartDate) <= @month AND YEAR(Menu.StartDate) = @year
+	WHERE MenuDishes.MenuID = @MenuID AND MONTH(Menu.StartDate) <= @Month AND YEAR(Menu.StartDate) = @Year
 )
 
 
 DROP FUNCTION IF EXISTS CanMakeReservation
 GO
 CREATE FUNCTION CanMakeReservation
-	(@customerID INT, @orderValue FLOAT, @lowerLimitValue FLOAT, @previousOrders INT, @elseValue FLOAT)
+	(@CustomerID INT, @OrderValue FLOAT, @LowerLimitValue FLOAT, @PreviousOrders INT, @ElseValue FLOAT)
 RETURNS BIT
 AS
 BEGIN
-	DECLARE @res BIT
-	SELECT @res = (CASE WHEN ((@lowerLimitValue <= @orderValue AND dbo.CustomerOrdersNumber(@customerID) >= @previousOrders) OR (@lowerLimitValue >= @orderValue AND dbo.CustomerOrdersNumberForValue(@customerID, @elseValue) <= @previousOrders)) THEN 1 ELSE 0 END);
-	RETURN @res;
+	DECLARE @Res BIT
+	SELECT @Res = (CASE WHEN ((@LowerLimitValue <= @OrderValue
+	                               AND dbo.CustomerOrdersNumber(@CustomerID) >= @PreviousOrders)
+	                              OR (@LowerLimitValue >= @OrderValue
+	                                      AND dbo.CustomerOrdersNumberForValue(@CustomerID, @ElseValue) <= @PreviousOrders))
+	    THEN 1 ELSE 0 END);
+	RETURN @Res;
 END
+
+SELECT dbo.CanMakeReservation(4, 25, 15, 2, 26)
+SELECT dbo.CanMakeReservation(4, 25, 15, 1, 26)
+
+
+DROP FUNCTION IF EXISTS GenerateInvoice
 GO
-select dbo.CanMakeReservation(4, 25, 15, 2, 26)
-select dbo.CanMakeReservation(4, 25, 15, 1, 26)
+CREATE FUNCTION GenerateInvoice
+	(@OrderID INT, @RestaurantName VARCHAR(50), @RestaurantAddress VARCHAR(200))
+RETURNS TABLE
+AS
+RETURN
+(
+	SELECT GETDATE() AS 'Date of issue',
+	       @RestaurantName AS 'Seller',
+	       @RestaurantAddress AS 'Seller address',
+	       O.CustomerID,
+	       CompanyName AS 'Buyer',
+	       Address+' '+PostalCode+' '+City+' '+Country AS 'Buyer address',
+	       OrderDate,
+	       DishName,
+	       OD.UnitPrice,
+	       Quantity,
+	       Value,
+	       SUM(OD.UnitPrice * OD.Quantity * (1 - ISNULL(Discounts.Value, 0))) AS 'TotalValue'
+	FROM Orders O
+	INNER JOIN Customers ON Customers.CustomerID = O.CustomerID
+	INNER JOIN CompanyCustomers ON CompanyCustomers.CustomerID = Customers.CustomerID
+	INNER JOIN OrderDetails OD ON OD.OrderID = O.OrderID
+	INNER JOIN Dishes ON Dishes.DishID = OD.DishID
+	LEFT JOIN OrderDiscounts ON OrderDiscounts.OrderID = OD.OrderID
+	LEFT JOIN Discounts ON Discounts.DiscountID = OrderDiscounts.DiscountID
+	WHERE O.OrderID = @OrderID
+	GROUP BY OD.OrderID, O.CustomerID, CompanyName, Address, PostalCode, City, Country, OrderDate, DishName, Quantity, Discounts.Value, OD.UnitPrice
+)
+
+SELECT * FROM GenerateInvoice(1, 'Restaurant', 'Address')
 
 
+DROP FUNCTION IF EXISTS GenerateCollectiveInvoice
+GO
+CREATE FUNCTION GenerateCollectiveInvoice
+	(@CustomerID INT, @RestaurantName VARCHAR(50), @RestaurantAddress VARCHAR(200), @Month INT, @Year INT)
+RETURNS TABLE
+AS
+RETURN
+(
+	SELECT GETDATE() AS 'Date of issue',
+	       @RestaurantName AS 'Seller',
+	       @RestaurantAddress AS 'Seller address',
+	       O.CustomerID,
+	       CompanyName AS 'Buyer',
+	       Address+' '+PostalCode+' '+City+' '+Country AS 'Buyer address',
+	       OrderDate,
+	       DishName,
+	       OD.UnitPrice,
+	       Quantity,
+	       Value,
+	       SUM(OD.UnitPrice * OD.Quantity * (1 - ISNULL(Discounts.Value, 0))) AS 'TotalValue'
+	FROM Orders O
+	INNER JOIN Customers ON Customers.CustomerID = O.CustomerID
+	INNER JOIN CompanyCustomers ON CompanyCustomers.CustomerID = Customers.CustomerID
+	INNER JOIN OrderDetails OD ON OD.OrderID = O.OrderID
+	INNER JOIN Dishes ON Dishes.DishID = OD.DishID
+	LEFT JOIN OrderDiscounts ON OrderDiscounts.OrderID = OD.OrderID
+	LEFT JOIN Discounts ON Discounts.DiscountID = OrderDiscounts.DiscountID
+	WHERE O.CustomerID = @CustomerID AND MONTH(OrderDate) = @Month AND YEAR(OrderDate) = @Year
+	GROUP BY OD.OrderID, O.CustomerID, CompanyName, Address, PostalCode, City, Country, OrderDate, DishName, Quantity, Discounts.Value, OD.UnitPrice
+)
+
+SELECT * FROM GenerateCollectiveInvoice(4, 'Restaurant', 'Address', 1, 2021)
