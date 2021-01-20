@@ -340,3 +340,24 @@ RETURN
 )
 
 SELECT * FROM GenerateCollectiveInvoice(4, 'Restaurant', 'Address', 1, 2021)
+
+DROP FUNCTION IF EXISTS CustomerHasNOrdersOfGivenValue
+GO
+CREATE FUNCTION CustomerHasNOrdersOfGivenValue
+    (@CustomerID INT, @N INT, @Value INT)
+RETURNS BIT
+AS
+BEGIN
+    DECLARE @OrdersNumber INT
+    SET @OrdersNumber = (SELECT COUNT(O.OrderID) FROM Orders O
+        INNER JOIN OrderDetails ODet ON O.OrderID = ODet.OrderID
+        LEFT JOIN OrderDiscounts ODis ON ODet.OrderID = ODis.OrderID
+        LEFT JOIN Discounts D ON ODis.DiscountID = D.DiscountID
+            WHERE O.CustomerID = @CustomerID
+        HAVING SUM(Quantity * UnitPrice * (1 - ISNULL(Value, 0))) > @Value
+        )
+
+    RETURN IIF((@OrdersNumber >= @N), 1, 0)
+END
+
+SELECT dbo.CustomerHasNOrdersOfGivenValue(4, 1, 10)

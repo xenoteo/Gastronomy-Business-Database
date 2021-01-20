@@ -713,3 +713,38 @@ BEGIN
 END
 
 EXEC DeactivateDiscount 1
+
+
+DROP PROCEDURE IF EXISTS TryAssignNewDiscountToIndividualCustomer
+GO
+CREATE PROCEDURE TryAssignNewDiscountToIndividualCustomer
+    @CustomerID INT,
+    @Z1 INT,
+    @K1 INT,
+    @R1 INT,
+    @K2 INT,
+    @R2 INT,
+    @D1 INT,
+    @K3 INT,
+    @R3 INT,
+    @D2 INT
+AS
+BEGIN
+    DECLARE @Date DATETIME
+    SET @Date = GETDATE()
+    IF dbo.CustomerHasNOrdersOfGivenValue(@CustomerID, @Z1, @K1) = 1
+        EXEC AddNewDiscount @CustomerID, @R1, @Date
+
+    IF dbo.CustomerOrderWorth(@CustomerID) >= @K2
+        BEGIN
+            DECLARE @DueDate DATETIME
+            SET @DueDate = DATEADD(DAY, @D1, @Date)
+            EXEC AddNewDiscount @CustomerID, @R2, @Date, @DueDate = @DueDate
+        END
+    IF dbo.CustomerOrderWorth(@CustomerID) >= @K3
+        BEGIN
+            DECLARE @DueDate DATETIME
+            SET @DueDate = DATEADD(DAY, @D2, @Date)
+            EXEC AddNewDiscount @CustomerID, @R3, @Date, @DueDate = @DueDate
+        END
+END
