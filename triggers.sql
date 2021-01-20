@@ -71,7 +71,6 @@ BEGIN
 END
 GO
 
--- nie uruchomilam tego triggera, bo sie boje xdd
 DROP TRIGGER IF EXISTS CanOrderSeafood
 GO
 CREATE TRIGGER CanOrderSeafood
@@ -90,13 +89,10 @@ BEGIN
 	                )
 	IF @ProductID IS NOT NULL
 	BEGIN
-		IF DATEPART(WEEKDAY, (SELECT i.OrderDate FROM INSERTED AS i)) <> 4
-		       AND DATEPART(WEEKDAY, (SELECT i.OrderDate FROM INSERTED AS i)) <> 5
-		       AND DATEPART(WEEKDAY, (SELECT i.OrderDate FROM INSERTED AS i)) <> 6
+		IF DATEPART(WEEKDAY, (SELECT OrderDate FROM INSERTED)) NOT IN (5, 6, 7)
 		BEGIN
 			RAISERROR ('Seafood were ordered in a wrong time', -1, -1)
 			ROLLBACK TRANSACTION
 		END
 	END
 END
-GO
