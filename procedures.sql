@@ -743,16 +743,18 @@ BEGIN
         END
     IF dbo.CustomerOrderWorth(@CustomerID) >= @K3
         BEGIN
-            DECLARE @DueDate DATETIME
-            SET @DueDate = DATEADD(DAY, @D2, @Date)
-            EXEC AddNewDiscount @CustomerID, @R3, @Date, @DueDate = @DueDate
+            DECLARE @NewDueDate DATETIME
+            SET @NewDueDate = DATEADD(DAY, @D2, @Date)
+            EXEC AddNewDiscount @CustomerID, @R3, @Date, @DueDate = @NewDueDate
         END
 END
 
+EXEC TryAssignNewDiscountToIndividualCustomer 1, 10, 30, 0.03, 1000, 0.05,7, 5000, 0.05, 7
 
-DROP PROCEDURE IF EXISTS TryAssignNewDiscountToIndividualCustomer
+
+DROP PROCEDURE IF EXISTS TryAssignNewDiscountToCompanyCustomer
 GO
-CREATE PROCEDURE TryAssignNewDiscountToIndividualCustomer
+CREATE PROCEDURE TryAssignNewDiscountToCompanyCustomer
     @CustomerID INT,
     @FZ INT,
     @FK1 INT,
@@ -791,3 +793,5 @@ BEGIN
     IF @QuarterWorth >= @FK2
         EXEC AddNewDiscount @DiscountID, @FR2, @Date
 END
+
+EXEC TryAssignNewDiscountToCompanyCustomer 1, 5, 500, 0.001, 0.04, 10000, 0.05
