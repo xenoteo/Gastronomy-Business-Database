@@ -151,14 +151,7 @@ RETURNS BIT
 AS
 BEGIN
     DECLARE @OrdersNumber INT
-    SET @OrdersNumber = (SELECT COUNT(O.OrderID) FROM Orders O
-        INNER JOIN OrderDetails ODet ON O.OrderID = ODet.OrderID
-        LEFT JOIN OrderDiscounts ODis ON ODet.OrderID = ODis.OrderID
-        LEFT JOIN Discounts D ON ODis.DiscountID = D.DiscountID
-            WHERE O.CustomerID = @CustomerID
-        HAVING SUM(Quantity * UnitPrice * (1 - ISNULL(Value, 0))) > @Value
-        )
-
+    SET @OrdersNumber = (SELECT dbo.CustomerOrdersNumberForValue(@CustomerID, @Value))
     RETURN IIF((@OrdersNumber >= @N), 1, 0)
 END
 
@@ -182,7 +175,7 @@ BEGIN
             WHERE O.CustomerID = @CustomerID AND @PeriodStartDate <= OrderDate AND OrderDate <= @PeriodEndDate
         HAVING SUM(Quantity * UnitPrice * (1 - ISNULL(Value, 0))) > @Value
         )
-    RETURN @OrdersNumber
+    RETURN ISNULL(@OrdersNumber, 0)
 END
 
 SELECT dbo.CustomerMonthOrdersNumberOfGivenValue(4, 10, '2021-01-20')
