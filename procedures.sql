@@ -783,7 +783,7 @@ BEGIN
         END
     ELSE IF @MonthOrdersNumber = 0
         BEGIN
-            EXEC DeactivateDiscount @DiscountID
+            EXEC ChangeDiscountValue @DiscountID, 0
         END
 
     DECLARE @Quarter INT
