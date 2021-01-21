@@ -8,7 +8,7 @@ In view of COVID-19 in several days there can be a limited number of seats (conc
 
 The firm serves dishes for individual customers and companies. The restaurant can prepare invoices for companies.
 
-More detailed description in Polish can be found [here](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/requirements.pdf).
+More detailed description in Polish can be found in the [requirements.pdf](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/requirements.pdf) file.
 
 ## Tech used
 - Microsoft SQL Server
@@ -255,3 +255,4 @@ For the purpose of efficient code format edition created [Formatter](https://git
 Provided functions:
 - Capitalizing of the SQL variables
 - Setting the SQL keywords uppercase
+- Removing all the `GO`s from the script
