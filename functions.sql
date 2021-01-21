@@ -16,9 +16,7 @@ BEGIN
     WHERE RealizationDateStart > @EndDate OR RealizationDateEnd < @StartDate OR RealizationDateStart IS NULL
     RETURN
 END
-
-SELECT * FROM FreeTables('2021-01-27', '2021-02-01')
-
+GO
 
 DROP FUNCTION IF EXISTS CustomerDiscounts
 GO
@@ -31,9 +29,7 @@ RETURN
 	SELECT * FROM Discounts
 	WHERE CustomerID = @CustomerID
 )
-
-SELECT * FROM CustomerDiscounts(4)
-
+GO
 
 DROP FUNCTION IF EXISTS CustomerOrdersNumberForValue
 GO
@@ -56,9 +52,6 @@ BEGIN
 END
 GO
 
-SELECT dbo.CustomerOrdersNumberForValue(4, 20.0) AS OrdersNumber
-
-
 DROP FUNCTION IF EXISTS CustomerOrdersNumber
 GO
 CREATE FUNCTION CustomerOrdersNumber
@@ -75,8 +68,6 @@ BEGIN
 	RETURN @OrderNumber;
 END
 GO
-
-SELECT dbo.CustomerOrdersNumber(4)
 
 DROP FUNCTION IF EXISTS CustomerOrderWorth
 GO
@@ -98,9 +89,7 @@ BEGIN
 		SET @Worth = 0;
 	RETURN @Worth;
 END
-
-SELECT dbo.CustomerOrderWorth(4) AS OrdersWorth
-
+GO
 
 DROP FUNCTION IF EXISTS CustomerMonthOrdersNumber
 GO
@@ -116,9 +105,7 @@ BEGIN
 		SET @OrdersNumber = 0
 	RETURN @OrdersNumber
 END
-
-SELECT dbo.CustomerMonthOrdersNumber(4, 1, 2021)
-
+GO
 
 DROP FUNCTION IF EXISTS CustomerQuarterWorth
 GO
@@ -139,9 +126,7 @@ BEGIN
 		SET @Worth = 0;
 	RETURN @Worth;
 END
-
-SELECT dbo.CustomerQuarterWorth(4, 1)
-
+GO
 
 DROP FUNCTION IF EXISTS CustomerHasNOrdersOfGivenValue
 GO
@@ -154,9 +139,7 @@ BEGIN
     SET @OrdersNumber = (SELECT dbo.CustomerOrdersNumberForValue(@CustomerID, @Value))
     RETURN IIF((@OrdersNumber >= @N), 1, 0)
 END
-
-SELECT dbo.CustomerHasNOrdersOfGivenValue(4, 1, 10)
-
+GO
 
 DROP FUNCTION IF EXISTS CustomerMonthOrdersNumberOfGivenValue
 GO
@@ -177,9 +160,7 @@ BEGIN
         )
     RETURN ISNULL(@OrdersNumber, 0)
 END
-
-SELECT dbo.CustomerMonthOrdersNumberOfGivenValue(4, 10, '2021-01-20')
-
+GO
 
 DROP FUNCTION IF EXISTS ReservationReport
 GO
@@ -195,9 +176,7 @@ RETURN
 	INNER JOIN Orders ON Orders.OrderID = Reservations.OrderID
 	WHERE RealizationDateStart >= @StartDate AND RealizationDateEnd <= @EndDate
 )
-
-SELECT * FROM ReservationReport('2021-01-17', '2021-03-15')
-
+GO
 
 DROP FUNCTION IF EXISTS MenuReport
 GO
@@ -222,9 +201,7 @@ BEGIN
     WHERE StartDate >= @StartDate AND EndDate <= @EndDate
     RETURN
 END
-
-SELECT * FROM MenuReport('2021-01-15', '2021-02-01')
-
+GO
 
 DROP FUNCTION IF EXISTS DiscountReport
 GO
@@ -247,9 +224,7 @@ BEGIN
     WHERE IssueDate >= @StartDate AND IssueDate <= @EndDate
     RETURN
 END
-
-SELECT * FROM DiscountReport('2021-01-15', '2021-02-01')
-
+GO
 
 DROP FUNCTION IF EXISTS CustomerOrders
 GO
@@ -273,9 +248,7 @@ BEGIN
     GROUP BY O.OrderID, OrderDate
     RETURN
 END
-
-SELECT * FROM CustomerOrders(4)
-
+GO
 
 DROP FUNCTION IF EXISTS MonthDishes
 GO
@@ -290,7 +263,7 @@ RETURN
 	INNER JOIN Menu ON MenuDishes.MenuID = Menu.MenuID
 	WHERE MenuDishes.MenuID = @MenuID AND MONTH(Menu.StartDate) <= @Month AND YEAR(Menu.StartDate) = @Year
 )
-
+GO
 
 DROP FUNCTION IF EXISTS CanMakeReservation
 GO
@@ -307,10 +280,7 @@ BEGIN
 	    THEN 1 ELSE 0 END);
 	RETURN @Res;
 END
-
-SELECT dbo.CanMakeReservation(4, 25, 15, 2, 26)
-SELECT dbo.CanMakeReservation(4, 25, 15, 1, 26)
-
+GO
 
 DROP FUNCTION IF EXISTS GenerateInvoice
 GO
@@ -342,9 +312,7 @@ RETURN
 	WHERE O.OrderID = @OrderID
 	GROUP BY OD.OrderID, O.CustomerID, CompanyName, Address, PostalCode, City, Country, OrderDate, DishName, Quantity, Discounts.Value, OD.UnitPrice
 )
-
-SELECT * FROM GenerateInvoice(1, 'Restaurant', 'Address')
-
+GO
 
 DROP FUNCTION IF EXISTS GenerateCollectiveInvoice
 GO
@@ -376,5 +344,4 @@ RETURN
 	WHERE O.CustomerID = @CustomerID AND MONTH(OrderDate) = @Month AND YEAR(OrderDate) = @Year
 	GROUP BY OD.OrderID, O.CustomerID, CompanyName, Address, PostalCode, City, Country, OrderDate, DishName, Quantity, Discounts.Value, OD.UnitPrice
 )
-
-SELECT * FROM GenerateCollectiveInvoice(4, 'Restaurant', 'Address', 1, 2021)
+GO
