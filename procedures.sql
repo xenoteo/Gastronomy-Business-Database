@@ -13,7 +13,7 @@ BEGIN
     INSERT INTO Customers(Address, City, PostalCode, Country, Phone, Email, IsCompany)
     VALUES (@Address, @City, @PostalCode, @Country, @Phone, @Email, @IsCompany)
 END
-
+GO
 
 DROP PROCEDURE IF EXISTS AddNewCompanyCustomer
 GO
@@ -36,11 +36,7 @@ BEGIN
     INSERT INTO CompanyCustomers(CustomerID, CompanyName, ContactPersonName, ContactPersonTitle, NIP)
     VALUES (@CustomerID, @CompanyName, @ContactPersonName, @ContactPersonTitle, @NIP)
 END
-
-EXEC AddNewCompanyCustomer 'Good Company', '123456789', 'email@Gmail.com', '6462933516'
-EXEC AddNewCompanyCustomer 'Good Company 2', '123456799', 'email2@Gmail.com', '1234056789', @Country = 'Poland'
-EXEC AddNewCompanyCustomer 'Motorola', '126445689', 'iamtheboss@motorola.com', '5672345195'
-
+GO
 
 DROP PROCEDURE IF EXISTS AddNewIndividualCustomer
 GO
@@ -61,10 +57,7 @@ BEGIN
     INSERT INTO IndividualCustomers(CustomerID, FirstName, LastName)
     VALUES (@CustomerID, @FirstName, @LastName)
 END
-
-EXEC AddNewIndividualCustomer 'John', 'Doe', '123456123', 'john@Gmail.com'
-EXEC AddNewIndividualCustomer 'John', 'Doe', '123456124', 'john2@Gmail.com', @City = 'Warsaw'
-
+GO
 
 DROP PROCEDURE IF EXISTS AddNewEmployee
 GO
@@ -84,10 +77,7 @@ BEGIN
 	INSERT INTO Employees (FirstName, LastName, Title, Phone, Email, HireDate, Address, PostalCode, City, Country)
 	VALUES (@FirstName, @LastName, @Title, @Phone, @Email, @HireDate, @Address, @PostalCode, @City, @Country)
 END
-
-EXEC AddNewEmployee 'Anne', 'Smith', 'head of procurement', '165935616', 'asmith@Gmail.com'
-EXEC AddNewEmployee 'James', 'Cameron', 'Warehouse manager', '789243666', 'jamesCameron@Restaurant.com', @Address = 'NorthStreet 31/16', @PostalCode = '30-200', @City = 'Naples', @Country = 'Italy'
-
+GO
 
 DROP PROCEDURE IF EXISTS AddNewOrder
 GO
@@ -107,9 +97,7 @@ BEGIN
 	INSERT INTO Orders (EmployeeID, CustomerID, OrderDate, RequiredRealisationDate, PickUpDate, IsTakeAway)
 	VALUES (@EmployeeID, @CustomerID, @OrderDate, @RequiredRealisationDate, @PickUpDate, @IsTakeAway)
 END
-
-EXEC AddNewOrder 5, 4, '2021/01/17', '2021/01/27'
-
+GO
 
 DROP PROCEDURE IF EXISTS AddNewOrderDetails
 GO
@@ -127,9 +115,7 @@ BEGIN
 	INSERT INTO OrderDetails (OrderID, DishID, UnitPrice, Quantity)
 	VALUES (@OrderID, @DishID, @UnitPrice, @Quantity)
 END
-
-EXEC AddNewOrderDetails 1, 1, 25.5
-
+GO
 
 DROP PROCEDURE IF EXISTS AddNewDish
 GO
@@ -141,9 +127,7 @@ BEGIN
 	INSERT INTO Dishes(DishName, UnitPrice)
 	VALUES (@Name, @UnitPrice)
 END
-
-EXEC AddNewDish 'Penne al forno', 25.50
-
+GO
 
 DROP PROCEDURE IF EXISTS AddProductToDish
 GO
@@ -159,9 +143,7 @@ BEGIN
 	INSERT INTO DishDetails (ProductID, DishID)
 	VALUES (@ProductID, @DishID)
 END
-
-EXEC AddProductToDish 2, 1
-
+GO
 
 DROP PROCEDURE IF EXISTS AddNewProduct
 GO
@@ -176,9 +158,7 @@ BEGIN
 	INSERT INTO Products (ProductName, ProductCategoryID, UnitsInStock)
 	VALUES (@Name, @ProductCategoryID, @UnitsInStock)
 END
-
-EXEC AddNewProduct 'Penne' , 2
-
+GO
 
 DROP PROCEDURE IF EXISTS AddNewProductCategory
 GO
@@ -190,10 +170,7 @@ BEGIN
 	INSERT INTO ProductCategories (ProductCategoryName, Description)
 	VALUES (@Name, @Description)
 END
-
-EXEC AddNewProductCategory 'Seafood', 'Seaweed, sushi and fish'
-EXEC AddNewProductCategory 'Pasta'
-
+GO
 
 DROP PROCEDURE IF EXISTS AddNewDiscount
 GO
@@ -209,10 +186,7 @@ BEGIN
     INSERT INTO Discounts(CustomerID, Value, DueDate, IssueDate, IsOneTime, IsAvailable)
     VALUES (@CustomerID, @Value, @DueDate, @IssueDate, @IsOneTime, @IsAvailable)
 END
-
-EXEC AddNewDiscount 4, 0.25, '2021-01-16'
-EXEC AddNewDiscount 4, 0.30, '2021-01-16', @IsOneTime = 0, @DueDate = '2021-02-16'
-
+GO
 
 DROP PROCEDURE IF EXISTS AddNewReservation
 GO
@@ -242,9 +216,7 @@ BEGIN
     INSERT INTO Reservations(EmployeeID, CustomerID, ReservationDate, RealizationDateStart, RealizationDateEnd, NumberOfPeople, TableID, IsByPerson, IsCancelled, OrderID)
     VALUES (@EmployeeID, @CustomerID, @ReservationDate, @RealizationDateStart, @RealizationDateEnd, @NumberOfPeople, @TableID, @IsByPerson, @IsCancelled, @OrderID)
 END
-
-EXEC AddNewReservation 5, 1, 1, 3, '2021-01-29 18:00', '2021-01-29 20:00','2021-01-16', 1
-
+GO
 
 DROP PROCEDURE IF EXISTS AddDishToMenu
 GO
@@ -261,10 +233,7 @@ BEGIN
     INSERT INTO MenuDishes(MenuID, DishID, IsAvailable)
     VALUES (@MenuID, @DishID, @IsAvailable)
 END
-
-EXEC AddDishToMenu 1, 1
-EXEC AddDishToMenu 1, 1, 0
-
+GO
 
 DROP PROCEDURE IF EXISTS AddNewMenu
 GO
@@ -277,9 +246,7 @@ BEGIN
     INSERT INTO Menu(ArrangementDate, StartDate, EndDate)
     VALUES (@ArrangementDate, @StartDate, @EndDate)
 END
-
-EXEC AddNewMenu '2021-01-16', '2021-01-18', '2021-01-22'
-
+GO
 
 DROP PROCEDURE IF EXISTS AddNewTable
 GO
@@ -295,10 +262,7 @@ BEGIN
         INSERT INTO Tables(MaxCapacity, CurrentCapacity)
         VALUES (@MaxCapacity, @MaxCapacity)
 END
-
-EXEC AddNewTable 10
-EXEC AddNewTable 10, 4
-
+GO
 
 DROP PROCEDURE IF EXISTS ChangeTableCurrentCapacity
 GO
@@ -313,9 +277,7 @@ BEGIN
     SET CurrentCapacity = @NewCurrentCapacity
     WHERE TableID = @TableID
 END
-
-EXEC ChangeTableCurrentCapacity 1, 5
-
+GO
 
 DROP PROCEDURE IF EXISTS ChangeTablesLimit
 GO
@@ -332,9 +294,7 @@ BEGIN
     UPDATE Tables
     SET CurrentCapacity = CAST(MaxCapacity * @Coef AS INT)
 END
-
-EXEC ChangeTablesLimit 10
-
+GO
 
 DROP PROCEDURE IF EXISTS RemoveTablesLimits
 GO
@@ -344,9 +304,7 @@ BEGIN
     UPDATE Tables
     SET CurrentCapacity = MaxCapacity
 END
-
-EXEC RemoveTablesLimits
-
+GO
 
 DROP PROCEDURE IF EXISTS ChangeTableParticipants
 GO
@@ -368,8 +326,7 @@ BEGIN
     SET NumberOfPeople = @NewNumberOfPeople
     WHERE ReservationID = @ReservationID
 END
-
-EXEC ChangeTableParticipants 3, 6
+GO
 
 DROP PROCEDURE IF EXISTS ChangeCustomerData
 GO
@@ -410,10 +367,7 @@ BEGIN
         SET Country = @Country
         WHERE CustomerID = @CustomerID
 END
-
-EXEC ChangeCustomerData 4, @Email = 'good_email@Gmail.com'
-EXEC ChangeCustomerData 5, @Email = 'john@Gmail.com', @City = 'Gdansk'
-
+GO
 
 DROP PROCEDURE IF EXISTS ChangeCompanyCustomerData
 GO
@@ -451,9 +405,7 @@ BEGIN
         SET NIP = @NIP
         WHERE CustomerID = @CustomerID
 END
-
-EXEC ChangeCompanyCustomerData 4, @CompanyName = 'Very Good Company', @ContactPersonName = 'John Doe', @City = 'Krakow'
-
+GO
 
 DROP PROCEDURE IF EXISTS ChangeIndividualCustomerData
 GO
@@ -481,9 +433,7 @@ BEGIN
         SET LastName = @LastName
         WHERE CustomerID = @CustomerID
 END
-
-EXEC ChangeIndividualCustomerData 6, @LastName = 'Smith', @Country = 'Poland'
-
+GO
 
 DROP PROCEDURE IF EXISTS ChangeEmployeeData
 GO
@@ -544,9 +494,7 @@ BEGIN
         SET Country = @Country
         WHERE EmployeeID = @EmployeeID
 END
-
-EXEC ChangeEmployeeData 1, @City = 'Warsaw', @Country = 'Poland'
-
+GO
 
 DROP PROCEDURE IF EXISTS RemoveEmployee
 GO
@@ -559,9 +507,7 @@ BEGIN
     DELETE FROM Employees
     WHERE EmployeeID = @EmployeeID
 END
-
-EXEC RemoveEmployee 1
-
+GO
 
 DROP PROCEDURE IF EXISTS CancelReservation
 GO
@@ -575,8 +521,7 @@ BEGIN
     SET IsCancelled = 1
     WHERE ReservationID = @ReservationID
 END
-
-EXEC CancelReservation 3
+GO
 
 DROP PROCEDURE IF EXISTS CancelOrder
 GO
@@ -591,7 +536,7 @@ BEGIN
    DELETE FROM OrderDetails
    WHERE OrderID = @OrderID
 END
-
+GO
 
 DROP PROCEDURE IF EXISTS ChangeDishAvailability
 GO
@@ -606,9 +551,7 @@ BEGIN
 	SET isAvailable = @NewAvailability
 	WHERE DishID = @DishID
 END
-
-EXEC ChangeDishAvailability 1, 1
-
+GO
 
 DROP PROCEDURE IF EXISTS ChangeProductUnitsInStock
 GO
@@ -623,9 +566,7 @@ BEGIN
 	SET UnitsInStock = @NewNumberOfUnits
 	WHERE ProductID = @ProductID
 END
-
-EXEC ChangeProductUnitsInStock 1, 10
-
+GO
 
 DROP PROCEDURE IF EXISTS ChangeMenuDishAvailability
 GO
@@ -643,9 +584,7 @@ BEGIN
 	SET isAvailable = @NewAvailability
 	WHERE DishID = @DishID AND MenuID = @MenuID
 END
-
-EXEC ChangeMenuDishAvailability 1, 1, 0
-
+GO
 
 DROP PROCEDURE IF EXISTS ChangeDishPrice
 GO
@@ -660,9 +599,7 @@ BEGIN
 	SET UnitPrice = @Price
 	WHERE DishID = @DishID
 END
-
-EXEC ChangeDishPrice 1, 12.25
-
+GO
 
 DROP PROCEDURE IF EXISTS UseOneTimeDiscount
 GO
@@ -678,9 +615,7 @@ BEGIN
 	SET IsAvailable = 0
 	WHERE DiscountID = @DiscountID
 END
-
-EXEC UseOneTimeDiscount 1
-
+GO
 
 DROP PROCEDURE IF EXISTS ChangeDiscountValue
 GO
@@ -695,9 +630,7 @@ BEGIN
 	SET Value = @NewValue
 	WHERE DiscountID = @DiscountID
 END
-
-EXEC ChangeDiscountValue 1, 0.33
-
+GO
 
 DROP PROCEDURE IF EXISTS DeactivateDiscount
 GO
@@ -711,9 +644,7 @@ BEGIN
 	SET IsAvailable = 0
 	WHERE DiscountID = @DiscountID
 END
-
-EXEC DeactivateDiscount 1
-
+GO
 
 DROP PROCEDURE IF EXISTS TryAssignNewDiscountToIndividualCustomer
 GO
@@ -748,9 +679,7 @@ BEGIN
             EXEC AddNewDiscount @CustomerID, @R3, @Date, @DueDate = @NewDueDate
         END
 END
-
-EXEC TryAssignNewDiscountToIndividualCustomer 1, 10, 30, 0.03, 1000, 0.05,7, 5000, 0.05, 7
-
+GO
 
 DROP PROCEDURE IF EXISTS TryAssignNewDiscountToCompanyCustomer
 GO
@@ -798,5 +727,4 @@ BEGIN
     IF @QuarterWorth >= @FK2
         EXEC AddNewDiscount @CustomerID, @FR2, @Date
 END
-
-EXEC TryAssignNewDiscountToCompanyCustomer 1, 5, 500, 0.001, 0.04, 10000, 0.05
+GO
