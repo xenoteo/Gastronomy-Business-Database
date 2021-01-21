@@ -8,7 +8,7 @@ In view of COVID-19 in several days there can be a limited number of seats (conc
 
 The firm serves dishes for individual customers and companies. The restaurant can prepare invoices for companies.
 
-More detailed description in Polish can be found in the [requirements.pdf](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/pdf/requirements.pdf) file.
+More detailed description (in Polish) can be found in the [requirements.pdf](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/pdf/requirements.pdf) file.
   
 Detailed documentation of the project (in Polish) can be found in the [documentation.pdf](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/pdf/documentation.pdf) file.
 
