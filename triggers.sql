@@ -52,25 +52,6 @@ BEGIN
 END
 GO
 
-DROP TRIGGER IF EXISTS CanMakeReservationTrigger
-GO
-CREATE TRIGGER CanMakeReservationTrigger
-ON Reservations
-FOR INSERT 
-AS
-BEGIN
-	DECLARE @CustomerID AS INT
-	SET @CustomerID = (SELECT i.CustomerID FROM INSERTED AS i)
-	DECLARE @OrderID AS INT
-	SET @OrderID = (SELECT i.OrderID FROM INSERTED AS i)
-	IF (SELECT dbo.CanMakeReservation(@CustomerID, @OrderID, 50.0, 5, 200.0)) = 0
-	BEGIN
-		RAISERROR ('This customer does not have the right to make reservation', -1, -1)
-		ROLLBACK TRANSACTION
-	END
-END
-GO
-
 DROP TRIGGER IF EXISTS CanOrderSeafood
 GO
 CREATE TRIGGER CanOrderSeafood
