@@ -8,7 +8,9 @@ In view of COVID-19 in several days there can be a limited number of seats (conc
 
 The firm serves dishes for individual customers and companies. The restaurant can prepare invoices for companies.
 
-More detailed description in Polish can be found in the [requirements.pdf](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/requirements.pdf) file.
+More detailed description in Polish can be found in the [requirements.pdf](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/pdf/requirements.pdf) file.
+  
+Detailed documentation of the project (in Polish) can be found in the [documentation.pdf](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/pdf/documentation.pdf) file.
 
 ## Tech used
 - Microsoft SQL Server
@@ -18,7 +20,7 @@ The code of tables can be found in [creating_tables.sql](https://github.com/xeno
 <a href="https://imgur.com/3GXqJeh"><img src="https://i.imgur.com/3GXqJeh.png" title="source: imgur.com" /></a>
 
 ## Procedures
-The code of scripts creating procedures can be found in [procedures.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/procedures.sql) script. There are also examples of using the procedures in [procedures_examples.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/procedures_examples.sql) script.  
+The code of scripts creating procedures can be found in [procedures.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/SQL/procedures.sql) script. There are also examples of using the procedures in [procedures_examples.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/SQL/procedures_examples.sql) script.  
   
 There were implemented the following procedures:
 - AddNewCustomer
@@ -58,7 +60,7 @@ There were implemented the following procedures:
 - TryAssignNewDiscountToIndividualCustomer
 
 ## Functions
-The code of scripts creating functions can be found in [functions.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/functions.sql) script. There are also examples of using the procedures in [functions_examples.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/functions_examples.sql) script.  
+The code of scripts creating functions can be found in [functions.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/SQL/functions.sql) script. There are also examples of using the procedures in [functions_examples.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/SQL/functions_examples.sql) script.  
   
 There were implemented the following functions:
 - FreeTables
@@ -80,7 +82,7 @@ There were implemented the following functions:
 - GenerateCollectiveInvoice
 
 ## Views
-The code of scripts creating views can be found in [views.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/views.sql) script. 
+The code of scripts creating views can be found in [views.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/SQL/views.sql) script. 
   
 There were implemented the following views:
 - ToDoOrders
@@ -100,7 +102,7 @@ There were implemented the following views:
 - ExhaustingProducts
 
 ## Triggers
-The code of scripts creating triggers can be found in [triggers.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/triggers.sql) script.  
+The code of scripts creating triggers can be found in [triggers.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/SQL/triggers.sql) script.  
   
 There were implemented the following triggers:
 - ChangeMenuDishAvailabilityTrigger
@@ -111,7 +113,7 @@ There were implemented the following triggers:
 - CompanyCustomerTrigger
 
 ## Indexes
-The code of scripts creating indexes can be found in [indexes.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/indexes.sql) script.  
+The code of scripts creating indexes can be found in [indexes.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/SQL/indexes.sql) script.  
   
 There were implemented the following indexes:
 - `LastName` in the `IndividualCustomers` table
@@ -128,7 +130,7 @@ There were implemented the following indexes:
 - `ProductCategoryName` in the `ProductCategories` table
 
 ## Roles
-The code of scripts creating indexes can be found in [roles.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/roles.sql) script.  
+The code of scripts creating indexes can be found in [roles.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/SQL/roles.sql) script.  
 
 ### Orders Manager
 Has privileges to the following procedures: 
