@@ -98,9 +98,9 @@ BEGIN
 END
 
 
-DROP TRIGGER IF EXISTS individualCustomerTrigger
+DROP TRIGGER IF EXISTS IndividualCustomerTrigger
 GO
-CREATE TRIGGER individualCustomerTrigger
+CREATE TRIGGER IndividualCustomerTrigger
 ON IndividualCustomers
 FOR INSERT 
 AS
@@ -110,9 +110,9 @@ BEGIN
 	WHERE CustomerID = (SELECT CustomerID FROM Inserted)
 END
 
-DROP TRIGGER IF EXISTS companyCustomerTrigger
+DROP TRIGGER IF EXISTS CompanyCustomerTrigger
 GO
-CREATE TRIGGER companyCustomerTrigger
+CREATE TRIGGER CompanyCustomerTrigger
 ON CompanyCustomers
 FOR INSERT 
 AS
