@@ -16,7 +16,7 @@ Detailed documentation of the project (in Polish) can be found in the [documenta
 - Microsoft SQL Server
 
 ## Diagram
-The code of tables can be found in [creating_tables.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/creating_tables.sql) script.
+The code of tables can be found in [creating_tables.sql](https://github.com/xenoteo/Gastronomy-Business-Database/blob/main/SQL/creating_tables.sql) script.
 <a href="https://imgur.com/3GXqJeh"><img src="https://i.imgur.com/3GXqJeh.png" title="source: imgur.com" /></a>
 
 ## Procedures
