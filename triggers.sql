@@ -96,11 +96,11 @@ BEGIN
 		END
 	END
 END
-
-
-DROP TRIGGER IF EXISTS individualCustomerTrigger
 GO
-CREATE TRIGGER individualCustomerTrigger
+
+DROP TRIGGER IF EXISTS IndividualCustomerTrigger
+GO
+CREATE TRIGGER IndividualCustomerTrigger
 ON IndividualCustomers
 FOR INSERT 
 AS
@@ -109,10 +109,11 @@ BEGIN
 	SET IsCompany = 0
 	WHERE CustomerID = (SELECT CustomerID FROM Inserted)
 END
-
-DROP TRIGGER IF EXISTS companyCustomerTrigger
 GO
-CREATE TRIGGER companyCustomerTrigger
+
+DROP TRIGGER IF EXISTS CompanyCustomerTrigger
+GO
+CREATE TRIGGER CompanyCustomerTrigger
 ON CompanyCustomers
 FOR INSERT 
 AS
