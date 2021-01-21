@@ -14,4 +14,4 @@ More detailed description in Polish can be found [here](https://github.com/xenot
 - Microsoft SQL Server
 
 ## Diagram
-<a href="https://imgur.com/d1AweE4"><img src="https://i.imgur.com/d1AweE4.png" title="source: imgur.com" /></a>
+<a href="https://imgur.com/3GXqJeh"><img src="https://i.imgur.com/3GXqJeh.png" title="source: imgur.com" /></a>
