@@ -4,7 +4,7 @@ CREATE VIEW ToDoOrders
 AS
 SELECT * FROM Orders
 WHERE GETDATE() < RequiredRealisationDate AND PickUpDate IS NULL
-
+GO
 
 DROP VIEW IF EXISTS CurrentMenu
 GO
@@ -14,7 +14,7 @@ SELECT M.MenuID, ArrangementDate, StartDate, EndDate, DishName, UnitPrice, D.IsA
 INNER JOIN MenuDishes MD on M.MenuID = MD.MenuID
 INNER JOIN Dishes D on D.DishID = MD.DishID
 WHERE StartDate <= GETDATE() AND GETDATE() <= EndDate
-
+GO
 
 DROP VIEW IF EXISTS UpcomingReservations
 GO
@@ -81,7 +81,7 @@ INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.Cus
 WHERE DATEPART(WEEK,IssueDate) = DATEPART(WEEK,GETDATE())
   AND MONTH(IssueDate) = MONTH(GETDATE())
   AND YEAR(GETDATE()) = YEAR(IssueDate)
-
+GO
 
 DROP VIEW IF EXISTS MonthDiscountsReport
 GO
@@ -96,7 +96,7 @@ INNER JOIN Customers ON Customers.CustomerID = Discounts.CustomerID
 INNER JOIN CompanyCustomers ON Customers.CustomerID = CompanyCustomers.CustomerID
 INNER JOIN IndividualCustomers ON IndividualCustomers.CustomerID = Customers.CustomerID
 WHERE MONTH(IssueDate) = MONTH(GETDATE()) AND YEAR(GETDATE()) = YEAR(IssueDate)
-
+GO
 
 DROP VIEW IF EXISTS WeekMenuReport
 GO
@@ -109,7 +109,7 @@ SELECT M.MenuID, ArrangementDate, StartDate, EndDate, DishName, UnitPrice, MD.Is
     WHERE  DATEPART(WEEK,StartDate) = DATEPART(WEEK,GETDATE())
       AND MONTH(StartDate) = MONTH(GETDATE())
       AND YEAR(GETDATE()) = YEAR(StartDate)
-
+GO
 
 DROP VIEW IF EXISTS MonthMenuReport
 GO
@@ -120,7 +120,7 @@ SELECT M.MenuID, ArrangementDate, StartDate, EndDate, DishName, UnitPrice, MD.Is
     INNER JOIN MenuDishes MD ON M.MenuID = MD.MenuID
     INNER JOIN Dishes D ON D.DishID = MD.DishID
     WHERE MONTH(StartDate) = MONTH(GETDATE()) AND YEAR(GETDATE()) = YEAR(StartDate)
-
+GO
 
 DROP VIEW IF EXISTS WeekOrderReport
 GO
@@ -136,7 +136,7 @@ WHERE DATEPART(WEEK,OrderDate) = DATEPART(WEEK,GETDATE())
   AND MONTH(OrderDate) = MONTH(GETDATE())
   AND YEAR(GETDATE()) = YEAR(OrderDate)
 GROUP BY Orders.OrderID, OrderDate, RequiredRealisationDate, PickUpDate, IsTakeAway
-
+GO
 
 DROP VIEW IF EXISTS MonthOrderReport
 GO
@@ -150,7 +150,7 @@ LEFT JOIN OrderDiscounts ON Orders.OrderID = OrderDiscounts.OrderID
 LEFT JOIN Discounts ON OrderDiscounts.DiscountID = Discounts.DiscountID
 WHERE MONTH(OrderDate) = MONTH(GETDATE()) AND YEAR(GETDATE()) = YEAR(OrderDate)
 GROUP BY Orders.OrderID, OrderDate, RequiredRealisationDate, PickUpDate, IsTakeAway
-
+GO
 
 DROP VIEW IF EXISTS OccupiedTablesNow
 GO
@@ -159,7 +159,7 @@ AS
 SELECT T.TableID, T.MaxCapacity, T.CurrentCapacity FROM Tables T
 INNER JOIN Reservations R ON T.TableID = R.TableID
 WHERE RealizationDateStart <= GETDATE() AND GETDATE() <= RealizationDateEnd
-
+GO
 
 DROP VIEW IF EXISTS FreeTablesNow
 GO
@@ -168,7 +168,7 @@ AS
 SELECT T.TableID, T.MaxCapacity, T.CurrentCapacity FROM Tables T
 LEFT JOIN Reservations R ON T.TableID = R.TableID
 WHERE RealizationDateStart > GETDATE() OR RealizationDateEnd < GETDATE() OR RealizationDateStart IS NULL
-
+GO
 
 DROP VIEW IF EXISTS UnavailableProducts
 GO
@@ -176,7 +176,7 @@ CREATE VIEW UnavailableProducts
 AS
 SELECT * FROM Products
 WHERE UnitsInStock = 0
-
+GO
 
 DROP VIEW IF EXISTS ExhaustingProducts
 GO
@@ -184,3 +184,4 @@ CREATE VIEW ExhaustingProducts
 AS
 SELECT * FROM Products
 WHERE UnitsInStock < 10
+GO
