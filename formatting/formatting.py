@@ -51,7 +51,7 @@ class Formatter:
         new_file.close()
         self.overwrite_file()
 
-    def clear_go(self):
+    def remove_GOs(self):
         """ A function removing all the GOs from the script. """
 
         file = open(self.filename, 'r')
