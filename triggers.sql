@@ -96,7 +96,7 @@ BEGIN
 		END
 	END
 END
-
+GO
 
 DROP TRIGGER IF EXISTS IndividualCustomerTrigger
 GO
@@ -109,6 +109,7 @@ BEGIN
 	SET IsCompany = 0
 	WHERE CustomerID = (SELECT CustomerID FROM Inserted)
 END
+GO
 
 DROP TRIGGER IF EXISTS CompanyCustomerTrigger
 GO
